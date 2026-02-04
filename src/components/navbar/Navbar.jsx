@@ -1,8 +1,10 @@
+import { LogIn } from 'lucide-react'
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 export const Navbar = () => {
     return (
-        <div className="navbar bg-base-100 shadow-sm px-[30px] lg:px-[150px] w-full flex items-center justify-between sticky top-0 z-50">
+        <header className="navbar shadow-sm px-7.5 w-full flex items-center justify-between sticky top-0">
             <div className="navbar-start">
                 <div className="dropdown">
                     <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -11,30 +13,22 @@ export const Navbar = () => {
                     <ul
                         tabIndex="-1"
                         className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-                        <li><a>All Books</a></li>
+                        <li><Link to="/" className='btn btn-sm btn-neutral btn-ghost'>Home</Link></li>
                         <li><a>Item 3</a></li>
                     </ul>
                 </div>
-                <a className="btn btn-neutral btn-ghost text-xl">IRC Library</a>
+                <Link to="/" className="btn btn-link text-2xl">IRC Library</Link>
             </div>
-            <div className="navbar-center hidden lg:flex">
+            <div className="navbar-center  hidden lg:flex">
                 <ul className="menu menu-horizontal px-1">
-                    <li><a className='btn btn-sm btn-neutral btn-ghost'>All Books</a></li>
-                    <li>
-                        <details>
-                            <summary className='btn btn-sm btn-neutral btn-ghost'>Parent</summary>
-                            <ul className="p-2 bg-base-100 w-40 z-1">
-                                <li><a className='btn btn-sm btn-neutral btn-ghost'>Submenu 1</a></li>
-                                <li><a className='btn btn-sm btn-neutral btn-ghost'>Submenu 2</a></li>
-                            </ul>
-                        </details>
-                    </li>
-                    <li><a className='btn btn-sm btn-neutral btn-ghost'>Item 3</a></li>
+                    <li><Link to="/" className='btn btn-sm btn-neutral btn-ghost text-xl'>Home</Link></li>
+                    <li><Link to="/catalog" className='btn btn-sm btn-neutral btn-ghost text-xl'>Catalog</Link></li>
+
                 </ul>
             </div>
             <div className="navbar-end">
-                <a className="btn btn-sm btn-neutral">Button</a>
+                <Link to="/librarian-dashboard" className="btn btn-md btn-neutral">Login <LogIn size={20} /></Link>
             </div>
-        </div>
+        </header>
     )
 }

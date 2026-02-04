@@ -1,14 +1,16 @@
 import './App.css'
 import { Home } from './pages/Home/Home'
+import Routes from './pages/Routes.jsx'
+import { BrowserRouter } from 'react-router-dom'
 
 
 function App() {
 
   return (
     <>
-      <main className='main px-[30px] lg:px-[150px] w-full min-h-screen flex items-center justify-center'>
-        <Home />
-      </main>
+      <BrowserRouter>    
+          <Routes />
+      </BrowserRouter>
     </>
   )
 }
