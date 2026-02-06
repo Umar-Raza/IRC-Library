@@ -1,10 +1,78 @@
+import { firestore } from '@/config/Firebase'
+import { addDoc, collection } from 'firebase/firestore'
 import { EllipsisVertical } from 'lucide-react'
 import { SquarePen } from 'lucide-react'
 import { Trash } from 'lucide-react'
 import { SquarePlus } from 'lucide-react'
 import React from 'react'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
+
+const initialState = {
+  bookName: '',
+  author: '',
+  volumes: '',
+  subject: '',
+  bookNumber: '',
+  titlePage: null, status: '',
+  publisher: '',
+}
 
 export const LibrarianDashboard = () => {
+  const [state, setState] = useState(initialState)
+  const [loading, setLoading] = useState(false)
+
+  const handleChange = (e) => {
+    if (e.target.type === 'file') {
+      setState({ ...state, [e.target.name]: e.target.files[0] });
+      return;
+    }
+    setState({ ...state, [e.target.name]: e.target.value })
+  }
+
+  const handleAddBooks = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+
+    let {
+      bookName,
+      author,
+      volumes,
+      subject,
+      bookNumber,
+      titlePage,
+      status,
+      publisher,
+    } = state;
+
+
+    const formData = {
+      bookName,
+      author,
+      volumes,
+      subject,
+      bookNumber,
+      titlePage,
+      status,
+      publisher,
+      // dateCreated: serverTimestamp(),
+    }
+
+    try {
+      await addDoc(collection(firestore, 'books'), formData)
+
+      setLoading(false)
+      toast.success('Book added successfully')
+      console.log('Book added successfully')
+      document.getElementById('my_modal_4').close()
+      setState(initialState)
+    } catch (err) {
+      console.log(err)
+      toast.error('Failed to add book')
+    }
+
+  }
+
   return (
     <div>
       <div className="card card-side bg-base-100 shadow-xl m-4 min-h-100vh">
@@ -14,20 +82,25 @@ export const LibrarianDashboard = () => {
             <button className="btn btn-neutral btn-square " onClick={() => document.getElementById('my_modal_4').showModal()}><SquarePlus /></button>
             <dialog id="my_modal_4" className="modal" dir='rtl'>
               <div className="modal-box w-11/12 max-w-5xl">
-                <form method="dialog">
-                  <button className="btn btn-active btn-circle text-red-600 text-lg absolute right-2 top-4">✕</button>
-                  <h1 className="font-bold text-end text-2xl text-neutral">Add Books</h1>
-                  <form className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    <input type="text" placeholder="نام کتاب" className="input input-bordered w-full" />
-                    <input type="text" placeholder="مصنف" className="input input-bordered w-full" />
-                    <input type="number" placeholder="جلدیں" className="input input-bordered w-full" />
-                    <input type="text" placeholder="قسم" className="input input-bordered w-full" />
-                    <input type="text" placeholder="کتاب نمبر" className="input input-bordered w-full" />
-                    <input type="file" placeholder="ٹائٹل پیج" className="file-input file-input-bordered w-full " />
-                    <div className='mt-3 w-full flex justify-center md:col-span-2'>
-                      <button className="btn btn-neutral btn-wide ">Add Book</button>
-                    </div>
-                  </form>
+                <button className="btn btn-error btn-soft btn-circle text-lg absolute right-2 top-4" onClick={() => document.getElementById('my_modal_4').close()}>✕</button>
+                <h1 className="font-bold text-end text-2xl text-neutral">Add Books</h1>
+                <form className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4" onSubmit={handleAddBooks}>
+                  <input type="text" placeholder="نام کتاب" value={state.bookName} onChange={handleChange} name='bookName' id='bookName' className="input file-input-lg input-bordered w-full" />
+                  <input type="text" placeholder="مصنف" value={state.author} name='author' onChange={handleChange} id='author' className="input file-input-lg input-bordered w-full" />
+                  <input type="number" placeholder="جلدیں" value={state.volumes} name='volumes' onChange={handleChange} id='volumes' className="input file-input-lg input-bordered w-full" />
+                  <input type="text" placeholder="قسم" value={state.subject} name='subject' onChange={handleChange} id='subject' className="input file-input-lg input-bordered w-full" />
+                  <input type="text" placeholder="کتاب نمبر" value={state.bookNumber} name='bookNumber' onChange={handleChange} id='bookNumber' className="input file-input-lg input-bordered w-full" />
+                  <input type="file" placeholder="ٹائٹل پیج" name='titlePage' onChange={handleChange} id='titlePage' className="file-input file-input-lg file-input-bordered w-full " />
+                  <select name='status' id='status' value={state.status} onChange={handleChange} className="select select-lg select-bordered w-full">
+                    <option value="" disabled={true}>اسٹیٹس</option>
+                    <option>لائبریری</option>
+                    <option>عرفان</option>
+                    <option>عباس</option>
+                  </select>
+                  <input type="text" placeholder="مکبتہ" value={state.publisher} name='publisher' onChange={handleChange} id='publisher' className="input file-input-lg input-bordered w-full " />
+                  <div className='mt-3 w-full flex justify-center md:col-span-2'>
+                    <button className="btn btn-neutral btn-wide" type='submit'>Add Book</button>
+                  </div>
                 </form>
               </div>
             </dialog>

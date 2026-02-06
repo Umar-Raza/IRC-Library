@@ -5,6 +5,7 @@ import { LibrarianLogin } from './dashboard/auth/librarianLogin/LibrarianLogin.j
 import { LibrarianDashboard } from './dashboard/librarianDasboard/LibrarianDashboard.jsx'
 import { Navbar } from '@/components/navbar/Navbar.jsx'
 import { Footer } from '@/components/footer/Footer.jsx'
+import { Toaster } from 'react-hot-toast'
 const index = () => {
     return (
         <>
@@ -15,6 +16,7 @@ const index = () => {
                     <Route path='/librarian-dashboard' element={<LibrarianDashboard />} />
                 </Routes>
             </main>
+            <Toaster />
             <Footer />
         </>
     )
