@@ -34,34 +34,15 @@ export const LibrarianDashboard = () => {
     e.preventDefault()
     setLoading(true)
 
-    let {
-      bookName,
-      author,
-      volumes,
-      subject,
-      bookNumber,
-      titlePage,
-      status,
-      publisher,
-    } = state;
-
+    const { titlePage, ...restOfData } = state;
 
     const formData = {
-      bookName,
-      author,
-      volumes,
-      subject,
-      bookNumber,
-      titlePage,
-      status,
-      publisher,
-      // dateCreated: serverTimestamp(),
+      ...restOfData,
+      createdAt: new Date(),
     }
-
     try {
       await addDoc(collection(firestore, 'books'), formData)
 
-      setLoading(false)
       toast.success('Book added successfully')
       console.log('Book added successfully')
       document.getElementById('my_modal_4').close()
@@ -69,8 +50,7 @@ export const LibrarianDashboard = () => {
     } catch (err) {
       console.log(err)
       toast.error('Failed to add book')
-    }
-
+    } finally { setLoading(false) }
   }
 
   return (
@@ -99,7 +79,16 @@ export const LibrarianDashboard = () => {
                   </select>
                   <input type="text" placeholder="مکبتہ" value={state.publisher} name='publisher' onChange={handleChange} id='publisher' className="input file-input-lg input-bordered w-full " />
                   <div className='mt-3 w-full flex justify-center md:col-span-2'>
-                    <button className="btn btn-neutral btn-wide" type='submit'>Add Book</button>
+                    <button dir='ltr' className="btn btn-neutral btn-wide" type='submit' disabled={loading}>
+                      {loading ? (
+                        <>
+                          <span className="loading loading-spinner loading-md"></span>
+                          <span>Adding...</span>
+                        </>
+                      ) : (
+                        'Add Book'
+                      )}
+                    </button>
                   </div>
                 </form>
               </div>
