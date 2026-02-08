@@ -1,10 +1,10 @@
-import { LogIn } from 'lucide-react'
+import { Library, LogIn } from 'lucide-react'
 import React from 'react'
 import { Link } from 'react-router-dom'
 
 export const Navbar = () => {
     return (
-        <header className="navbar shadow-sm px-7.5 w-full flex items-center justify-between sticky top-0">
+        <header className="navbar shadow-sm px-7.5 w-full flex items-center justify-between sticky top-0 z-50 bg-base-100">
             <div className="navbar-start">
                 <div className="dropdown">
                     <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -17,7 +17,7 @@ export const Navbar = () => {
                         <li><a>Item 3</a></li>
                     </ul>
                 </div>
-                <Link to="/" className="btn btn-link text-2xl">IRC Library</Link>
+                <Link to="/" className="btn btn-link text-2xl"><Library />IRC Library</Link>
             </div>
             <div className="navbar-center  hidden lg:flex">
                 <ul className="menu menu-horizontal px-1">
