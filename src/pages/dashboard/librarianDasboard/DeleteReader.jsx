@@ -16,11 +16,10 @@ export const DeleteReader = ({ readerId }) => {
             }
         }
     };
-
     return (
         <button
             onClick={() => handleDeleteReader(readerId)}
-            className="btn btn-ghost btn-xs text-error"
+            className="btn btn-sm btn-error"
         >
             <Trash size={14} />
         </button>

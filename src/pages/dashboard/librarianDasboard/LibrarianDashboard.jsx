@@ -4,6 +4,7 @@ import { addDoc, collection, doc, onSnapshot, orderBy, query, updateDoc } from '
 import { EllipsisVertical } from 'lucide-react'
 import { SquarePen } from 'lucide-react'
 import { SquarePlus } from 'lucide-react'
+import { Download } from 'lucide-react'
 import React from 'react'
 import { useEffect } from 'react'
 import { useRef, useState } from 'react'
@@ -14,7 +15,7 @@ import { DeleteReader } from './DeleteReader'
 const initialState = {
   bookName: '',
   author: '',
-  volumes: '',
+  bookLink: '',
   subject: '',
   bookNumber: '',
   titlePage: null, status: '',
@@ -52,8 +53,8 @@ export const LibrarianDashboard = () => {
 
     if (titlePage && titlePage instanceof File) {
       const options = {
-        maxSizeMB: 0.05,
-        maxWidthOrHeight: 48,
+        maxSizeMB: 0.2,
+        maxWidthOrHeight: 1920,
         useWebWorker: true,
       }
 
@@ -133,24 +134,26 @@ export const LibrarianDashboard = () => {
   // 2. Add new reader and update book status
   const handleAddNewReaderSubmit = async () => {
     const trimmedName = newReaderName.trim();
-    if (!trimmedName || !activeBookId) return;
+    if (!trimmedName) return;
 
     setLoading(true);
     try {
-      await addDoc(collection(firestore, 'readers'), { 
+      await addDoc(collection(firestore, 'readers'), {
         name: trimmedName,
-        createdAt: new Date() 
-      }); 
-      await updateStatus(activeBookId, trimmedName);
+        createdAt: new Date()
+      });
+      if (activeBookId) {
+        await updateStatus(activeBookId, trimmedName);
+      }
       setNewReaderName('');
       document.getElementById('reader_modal').close();
+      toast.success('New reader added successfully!');
     } catch (err) {
       toast.error("Something went wrong while adding new reader!");
     } finally {
       setLoading(false);
     }
   };
-
 
   // 3. Status update Function
   const updateStatus = async (bookId, newStatus) => {
@@ -169,7 +172,7 @@ export const LibrarianDashboard = () => {
     setState({
       bookName: book.bookName || '',
       author: book.author || '',
-      volumes: book.volumes || '',
+      bookLink: book.bookLink || '',
       subject: book.subject || '',
       bookNumber: book.bookNumber || '',
       titlePage: book.titlePage || null,
@@ -183,145 +186,183 @@ export const LibrarianDashboard = () => {
   };
 
   return (
-    <div>
-      <div className="card card-side bg-base-100 shadow-xl m-4 min-h-100vh">
-        <div className="card-body">
-          <div className="btn-and-heading flex justify-between items-center">
-            <h2 className="card-title text-2xl font-bold mt-3">Librarian Dashboard</h2>
-            <button className="btn btn-neutral btn-square " onClick={() => { setEditingBookId(null); setState(initialState); document.getElementById('my_modal_4').showModal() }}><SquarePlus /></button>
-            <dialog id="my_modal_4" className="modal" dir='rtl'>
-              <div className="modal-box w-11/12 max-w-5xl">
-                <button className="btn btn-error btn-soft btn-circle text-lg absolute right-2 top-4" onClick={() => { document.getElementById('my_modal_4').close(); setEditingBookId(null); setState(initialState); }}>✕</button>
-                <h1 className="font-bold text-end text-2xl text-neutral">{editingBookId ? 'Edit Book' : 'Add Books'}</h1>
-                <form className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4" onSubmit={handleSubmit}>
-                  <input type="text" required placeholder="نام کتاب" value={state.bookName} onChange={handleChange} name='bookName' id='bookName' className="input file-input-lg input-bordered w-full" />
-                  <input type="text" required placeholder="مصنف" value={state.author} name='author' onChange={handleChange} id='author' className="input file-input-lg input-bordered w-full" />
-                  <input type="number" required placeholder="جلدیں" value={state.volumes} name='volumes' onChange={handleChange} id='volumes' className="input file-input-lg input-bordered w-full" />
-                  <input type="text" required placeholder="قسم" value={state.subject} name='subject' onChange={handleChange} id='subject' className="input file-input-lg input-bordered w-full" />
-                  <input type="text" required placeholder="کتاب نمبر" value={state.bookNumber} name='bookNumber' onChange={handleChange} id='bookNumber' className="input file-input-lg input-bordered w-full" />
-                  <input type="file" ref={fileInputRef} placeholder="ٹائٹل پیج" name='titlePage' onChange={handleChange} id='titlePage' className="file-input file-input-lg file-input-bordered w-full " />
-                  <select name='status' required id='status' value={state.status || ""} onChange={handleChange} className="select select-lg select-bordered w-full">
-                    <option value="" required disabled={true}>اسٹیٹس</option>
-                    <option value="library">لائبریری</option>
-                  </select>
-                  <input type="text" placeholder="مکبتہ" value={state.publisher} name='publisher' onChange={handleChange} id='publisher' className="input file-input-lg input-bordered w-full " />
-                  <div className='mt-3 w-full flex justify-center md:col-span-2'>
-                    <button dir='ltr' className="btn btn-neutral btn-wide" type='submit' disabled={loading}>
-                      {loading ? (
-                        <>
-                          <span className="loading loading-spinner loading-md"></span>
-                          <span>Processing...</span>
-                        </>
-                      ) : (
-                        editingBookId ? 'Update Book' : 'Add Book'
-                      )}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </dialog>
+    <div className="card card-side bg-base-100 shadow-xl m-4 w-[80%] mx-auto min-h-100vh">
+      <div className="card-body">
+        <div className="btn-and-heading flex justify-between items-center">
+          <h2 className="card-title text-2xl font-bold mt-3 mb-5">Librarian Dashboard</h2>
+          <div className="flex gap-2 mb-5">
+            <button className="btn btn-neutral" onClick={() => document.getElementById('reader_modal').showModal()}>Manage Readers</button>
+            <button className="btn btn-neutral " onClick={() => { setEditingBookId(null); setState(initialState); document.getElementById('my_modal_4').showModal() }}>Add New Book<SquarePlus /></button>
           </div>
-          <div className="overflow-x-auto max-h-[80vh]" dir="rtl">
-            <table className="table w-full text-right mt-5 noto-naskh-arabic-font min-h-100vh border-separate ">
-              <thead className="bg-neutral text-neutral-content sticky top-0 z-10">
-                <tr className="text-lg  text-bold">
-                  <th className="rounded-tr-2xl">#</th>
-                  <th>ٹائٹل پیج</th>
-                  <th>نام کتاب</th>
-                  <th>مصنف</th>
-                  <th>جلدیں</th>
-                  <th>قسم</th>
-                  <th>کتاب نمبر</th>
-                  <th>ایکشن</th>
-                  <th className="rounded-tl-2xl"><legend className="fieldset-legend text-neutral-content">اسٹیٹس</legend></th>
-                </tr>
-              </thead>
-              <tbody>
-                {books.length === 0 ? (
-                  // Skeleton loader for 5 rows
-                  [...Array(10)].map((_, i) => (
-                    <tr key={i}>
-                      <td><div className="skeleton bg-neutral/10 h-4 w-4"></div></td>
-                      <td><div className="skeleton bg-neutral/10 h-12 w-12 shrink-0 rounded-full"></div></td>
-                      <td><div className="skeleton bg-neutral/10 h-4 w-32"></div></td>
-                      <td><div className="skeleton bg-neutral/10 h-4 w-24"></div></td>
-                      <td><div className="skeleton bg-neutral/10 h-4 w-8"></div></td>
-                      <td><div className="skeleton bg-neutral/10 h-4 w-20"></div></td>
-                      <td><div className="skeleton bg-neutral/10 h-4 w-16"></div></td>
-                      <td><div className="skeleton bg-neutral/10 h-8 w-8"></div></td>
-                      <td><div className="skeleton bg-neutral/10 h-8 w-40"></div></td>
-                    </tr>
-                  ))
-                ) : books.map((book, index) => (
-                  <tr key={book.id} className="hover">
-                    <td className="font-bold">{index + 1}</td>
-                    <td><img
-                      className="mask mask-squircle w-12 h-12 m-0 p-0"
-                      src={book.titlePage || "https://img.daisyui.com/images/stock/photo-1567653418876-5bb0e566e1c2.webp"} /></td>
-                    <td className="font-bold">{book.bookName}</td>
-                    <td>{book.author}</td>
-                    <td>{book.volumes}</td>
-                    <td>{book.subject}</td>
-                    <td>{book.bookNumber}</td>
-                    {/* Delete and Edit buttons*/}
+
+          <dialog id="my_modal_4" className="modal" dir='rtl'>
+            <div className="modal-box w-11/12 max-w-5xl">
+              <button className="btn btn-error btn-soft btn-circle text-lg absolute right-2 top-4" onClick={() => { document.getElementById('my_modal_4').close(); setEditingBookId(null); setState(initialState); }}>✕</button>
+              <h1 className="font-bold text-end text-2xl text-neutral">{editingBookId ? 'Edit Book' : 'Add Books'}</h1>
+              <form className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4" onSubmit={handleSubmit}>
+                <input type="text" required placeholder="نام کتاب" value={state.bookName} onChange={handleChange} name='bookName' id='bookName' className="input file-input-lg input-bordered w-full" />
+                <input type="text" required placeholder="مصنف" value={state.author} name='author' onChange={handleChange} id='author' className="input file-input-lg input-bordered w-full" />
+                <input type="text" placeholder="کتاب لنک" value={state.bookLink} name='bookLink' onChange={handleChange} id='bookLink' className="input file-input-lg input-bordered w-full" />
+                <input type="text" required placeholder="قسم" value={state.subject} name='subject' onChange={handleChange} id='subject' className="input file-input-lg input-bordered w-full" />
+                <input type="text" required placeholder="کتاب نمبر" value={state.bookNumber} name='bookNumber' onChange={handleChange} id='bookNumber' className="input file-input-lg input-bordered w-full" />
+                <input type="file" ref={fileInputRef} placeholder="ٹائٹل پیج" name='titlePage' onChange={handleChange} id='titlePage' className="file-input file-input-lg file-input-bordered w-full " />
+                <select name='status' required id='status' value={state.status || ""} onChange={handleChange} className="select select-lg select-bordered w-full">
+                  <option value="" required disabled={true}>اسٹیٹس</option>
+                  <option value="library" defaultValue={true}>لائبریری</option>
+                </select>
+                <input type="text" placeholder="مکبتہ" value={state.publisher} name='publisher' onChange={handleChange} id='publisher' className="input file-input-lg input-bordered w-full " />
+                <div className='mt-3 w-full flex justify-center md:col-span-2'>
+                  <button dir='ltr' className="btn btn-neutral btn-wide" type='submit' disabled={loading}>
+                    {loading ? (
+                      <>
+                        <span className="loading loading-spinner loading-md"></span>
+                        <span>Processing...</span>
+                      </>
+                    ) : (
+                      editingBookId ? 'Update Book' : 'Add Book'
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </dialog>
+        </div>
+        <div className="overflow-x-auto max-h-[70vh]" dir="rtl">
+          <table className="table w-full noto-naskh-arabic-font">
+            <thead className="bg-neutral sticky top-0 z-10 text-neutral-content">
+              <tr>
+                <th className="w-10">#</th>
+                <th className="w-20">تصویر</th>
+                <th className="w-60">کتاب</th>
+                <th className="w-40">کتاب کی تفصیل</th>
+                <th className="w-30">کتاب ڈاؤن لوڈ</th>
+                <th className="w-40 text-center">اسٹیٹس</th>
+                <th className="w-24 text-center">ایکشن</th>
+              </tr>
+            </thead>
+            <tbody>
+              {books.length === 0 ? (
+                [...Array(10)].map((_, i) => (
+                  <tr key={i} className="animate-pulse">
+                    <td><div className="h-4 w-4 bg-base-300 rounded"></div></td>
+                    <td><div className="h-14 w-14 bg-base-300 rounded-xl"></div></td>
                     <td>
-                      <div className="dropdown dropdown-bottom dropdown-end">
-                        <div tabIndex={0} role="button" className="text-3xl text-neutral cursor-pointer"><EllipsisVertical /></div>
-                        <ul tabIndex="-1" className="dropdown-content menu rounded-box z-1 p-2  shadow-sm">
-                          <DeleteBook bookId={book.id} />
-                          <button
-                            onClick={() => handleEditBook(book)}
-                            className="btn btn-secondary btn-sm m-1"
-                          >
-                            <SquarePen size={16} />
-                          </button>
-                        </ul>
-                      </div>
+                      <div className="h-4 w-32 bg-base-300 rounded mb-2"></div>
+                      <div className="h-3 w-24 bg-base-300 rounded"></div>
                     </td>
-                    <td>
-                      <select
-                        className={`select select-bordered select-sm w-40 ${book.status === 'library' ? 'text-success border-success' : 'text-error border-error'}`}
-                        value={book.status}
-                        onChange={(e) => {
-                          if (e.target.value === "ADD_NEW") {
-                            setActiveBookId(book.id);
-                            document.getElementById('reader_modal').showModal();
-                          } else {
-                            updateStatus(book.id, e.target.value);
-                          }
-                        }}
-                      >
-                        <option value="library">لائبریری</option>
-                        {readers.map((reader) => (
-                          <option key={reader.id} value={reader.name}>{reader.name}</option>
-                        ))}
-                        <option value="ADD_NEW" className="font-bold text-white text-center bg-neutral ">Manage Readers</option>
-                      </select>
-                    </td>
+                    <td><div className="h-4 w-20 bg-base-300 rounded mb-2">
+                    </div><div className="h-4 w-16 bg-base-300 rounded"></div></td>
+                    <td><div className="h-4 w-12 bg-base-300 rounded"></div></td>
+                    <td><div className="h-8 w-36 bg-base-300 rounded mx-auto"></div></td>
+                    <td><div className="h-8 w-8 bg-base-300 rounded mx-auto"></div></td>
                   </tr>
-                ))}
-              </tbody>
-              <tfoot>
-                <tr className="text-lg">
-                  <th>#</th>
-                  <th>ٹائٹل</th>
-                  <th>نام کتاب</th>
-                  <th>مصنف</th>
-                  <th>جلدیں</th>
-                  <th>قسم</th>
-                  <th>کتاب نمبر</th>
-                  <th>ایکشن</th>
-                  <th>اسٹیٹس</th>
+                ))
+              ) : books.map((book, index) => (
+                <tr
+                  key={book.id}
+                  className="border-b border-base-300 align-top hover:bg-base-200/40"
+                >
+                  <td className="py-4 font-bold">{index + 1}</td>
+                  <td className="py-4">
+                    <div className="dropdown dropdown-right dropdown-hover">
+                      <img
+                        tabIndex={0}
+                        src={book.titlePage}
+                        className="w-14 h-14 rounded-xl object-cover shadow cursor-pointer"
+                        alt={book.bookName}
+                      />
+                      <div tabIndex={0} className="dropdown-content z-[100] card card-compact w-64 p-2 shadow bg-base-100 border border-base-300 ml-2">
+                        <img src={book.titlePage} className="w-full h-auto rounded-lg" alt={book.bookName} />
+                        <div className="card-body p-2">
+                          <h3 className="card-title mx-auto text-sm">{book.bookName}</h3>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-4">
+                    <div className="space-y-1">
+                      <p className="text-[21px] bookName">{book.bookName}</p>
+                      <p className="text-sm">
+                        <span className="font-semibold text-[18px]">مصنف:</span>
+                        <span className="text-[16px] mr-1">
+                          {book.author}
+                        </span>
+                      </p>
+                    </div>
+                  </td>
+                  <td className="py-4">
+                    <div className="space-y-1 text-sm">
+                      <p>
+                        <span className="font-semibold text-[18px]">قسم:</span>
+                        <span className="text-[16px] mr-1">
+                          {book.subject}
+                        </span>
+                      </p>
+                      <p>
+                        <span className="font-semibold text-[18px]">کتاب نمبر:</span>
+                        <span className="text-[16px] mr-1">
+                          {book.bookNumber}
+                        </span>
+                      </p>
+                    </div>
+                  </td>
+                  <td className="py-4 text-sm font-semibold">
+                    <a
+                      href={book.bookLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-ghost btn-square text-neutral"
+                    >
+                      <Download size={20} />
+                    </a>
+                  </td>
+
+                  <td className="py-4 text-center">
+                    <select
+                      className={`select select-sm w-36 ${book.status === 'library'
+                        ? 'select-success'
+                        : 'select-error'
+                        }`}
+                      value={book.status}
+                      onChange={(e) => updateStatus(book.id, e.target.value)}
+                    >
+                      <option value="library">لائبریری</option>
+                      {readers.map((reader) => (
+                        <option key={reader.id} value={reader.name}>
+                          {reader.name}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+
+                  {/* Actions */}
+                  <td className="pt-6 text-center">
+                    <div className="dropdown dropdown-left">
+                      <button className="btn btn-ghost btn-sm">
+                        <EllipsisVertical />
+                      </button>
+                      <ul className="dropdown-content menu shadow bg-base-100 rounded-box w-20">
+                        <li>
+                          <button className='btn btn-neutral' onClick={() => handleEditBook(book)}>
+                            <SquarePen size={14} />
+                          </button>
+                        </li>
+                        <li>
+                          <DeleteBook bookId={book.id} />
+                        </li>
+                      </ul>
+                    </div>
+                  </td>
                 </tr>
-              </tfoot>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div >
 
       {/* Add new reader modal */}
       <dialog id="reader_modal" className="modal">
-        <div className="modal-box max-w-sm " dir="ltr">
+        <div className="modal-box max-w-sm " >
           <form method="dialog">
             <button className="btn btn-sm btn-circle btn-ghost absolute btn-error right-2 top-2">✕</button>
           </form>
@@ -339,7 +380,7 @@ export const LibrarianDashboard = () => {
           <div className="mt-4 max-h-40 overflow-y-auto border rounded-lg p-2">
             <p className="text-xs font-bold mb-2 text-gray-500">Existing Readers (Click trash to delete):</p>
             {readers.map((reader) => (
-              <div key={reader.id} className="flex justify-between items-center p-1 hover:bg-base-200 rounded">
+              <div key={reader.id} className="flex justify-between items-center p-1 hover:bg-base-200 rounded" dir="rtl">
                 <span className="text-sm">{reader.name}</span>
                 <DeleteReader readerId={reader.id} />
               </div>
