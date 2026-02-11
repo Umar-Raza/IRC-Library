@@ -11,7 +11,7 @@ import { useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { DeleteBook } from './DeleteBook'
 import { DeleteReader } from './DeleteReader'
-
+import { SearchBooks } from '@/components/searchBooks/SearchBooks'
 const initialState = {
   bookName: '',
   author: '',
@@ -31,6 +31,9 @@ export const LibrarianDashboard = () => {
   const [newReaderName, setNewReaderName] = useState('')
   const [editingBookId, setEditingBookId] = useState(null)
   const [activeBookId, setActiveBookId] = useState(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [subjectFilter, setSubjectFilter] = useState('')
+  const [sortOrder, setSortOrder] = useState('newest')
 
 
 
@@ -185,6 +188,27 @@ export const LibrarianDashboard = () => {
     document.getElementById('my_modal_4').showModal();
   };
 
+  // Filter books based on search term
+  const filteredBooks = books
+    .filter((book) => {
+      const searchLower = searchTerm.toLowerCase();
+      const matchesSearch =
+        book.bookName?.toLowerCase().includes(searchLower) ||
+        book.author?.toLowerCase().includes(searchLower);
+      const matchesSubject = subjectFilter === "" || subjectFilter === "کتابوں کی قسمیں" || book.subject === subjectFilter;
+      return matchesSearch && matchesSubject;
+    })
+    .sort((a, b) => {
+      const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(0);
+      const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(0);
+
+      if (sortOrder === 'نئی کتابیں') return dateB.getTime() - dateA.getTime();
+      if (sortOrder === 'پرانی کتابیں') return dateA.getTime() - dateB.getTime();
+      if (sortOrder === 'ا → ے') return (a.bookName || "").localeCompare((b.bookName || ""), 'ur');
+      if (sortOrder === 'ے → ا') return (b.bookName || "").localeCompare((a.bookName || ""), 'ur');
+      return 0;
+    });
+
   return (
     <div className="card card-side bg-base-100 shadow-xl m-4 w-[80%] mx-auto min-h-100vh">
       <div className="card-body">
@@ -194,7 +218,6 @@ export const LibrarianDashboard = () => {
             <button className="btn btn-neutral" onClick={() => document.getElementById('reader_modal').showModal()}>Manage Readers</button>
             <button className="btn btn-neutral " onClick={() => { setEditingBookId(null); setState(initialState); document.getElementById('my_modal_4').showModal() }}>Add New Book<SquarePlus /></button>
           </div>
-
           <dialog id="my_modal_4" className="modal" dir='rtl'>
             <div className="modal-box w-11/12 max-w-5xl">
               <button className="btn btn-error btn-soft btn-circle text-lg absolute right-2 top-4" onClick={() => { document.getElementById('my_modal_4').close(); setEditingBookId(null); setState(initialState); }}>✕</button>
@@ -227,7 +250,32 @@ export const LibrarianDashboard = () => {
             </div>
           </dialog>
         </div>
-        <div className="overflow-x-auto max-h-[70vh]" dir="rtl">
+        <div className="bg-base-100 rounded-xl shadow p-4 mb-4" dir="rtl">
+          <div className="flex flex-col md:flex-row gap-4">
+            <SearchBooks onSearch={(value) => setSearchTerm(value)} />
+            <select
+              className="select select-bordered w-full md:w-1/5"
+              value={subjectFilter}
+              onChange={(e) => setSubjectFilter(e.target.value)}
+            >
+              <option value="">تمام مضامین</option>
+              {[...new Set(books.map(book => book.subject))].filter(Boolean).map((subject) => (
+                <option key={subject} value={subject}>{subject}</option>
+              ))}
+            </select>
+            <select
+              className="select select-bordered w-full md:w-1/5"
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+            >
+              <option>نئی کتابیں</option>
+              <option>پرانی کتابیں</option>
+              <option>ا → ے</option>
+              <option>ے → ا</option>
+            </select>
+          </div>
+        </div>
+        <div className="overflow-x-auto max-h-[60vh]" dir="rtl">
           <table className="table w-full noto-naskh-arabic-font">
             <thead className="bg-neutral sticky top-0 z-10 text-neutral-content">
               <tr>
@@ -241,7 +289,7 @@ export const LibrarianDashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {books.length === 0 ? (
+              {books.length === 0 && !searchTerm ? (
                 [...Array(10)].map((_, i) => (
                   <tr key={i} className="animate-pulse">
                     <td><div className="h-4 w-4 bg-base-300 rounded"></div></td>
@@ -257,21 +305,26 @@ export const LibrarianDashboard = () => {
                     <td><div className="h-8 w-8 bg-base-300 rounded mx-auto"></div></td>
                   </tr>
                 ))
-              ) : books.map((book, index) => (
+              ) : filteredBooks.map((book, index) => (
                 <tr
                   key={book.id}
                   className="border-b border-base-300 align-top hover:bg-base-200/40"
                 >
                   <td className="py-4 font-bold">{index + 1}</td>
                   <td className="py-4">
-                    <div className="dropdown dropdown-right dropdown-hover">
+                    <div className="dropdown dropdown-right dropdown-hover relative">
+                      {book.createdAt && (new Date() - book.createdAt.toDate()) / (1000 * 60 * 60 * 24) <= 15 && (
+                        <span className="badge badge-accent badge-sm font-sans animate-pulse absolute bottom-17 -right-7 z-8">
+                          NEW
+                        </span>
+                      )}
                       <img
                         tabIndex={0}
                         src={book.titlePage}
-                        className="w-14 h-14 rounded-xl object-cover shadow cursor-pointer"
+                        className="w-18 h-20 rounded-sm object-cover shadow cursor-pointer"
                         alt={book.bookName}
                       />
-                      <div tabIndex={0} className="dropdown-content z-[100] card card-compact w-64 p-2 shadow bg-base-100 border border-base-300 ml-2">
+                      <div tabIndex={0} className="dropdown-content z-100 card card-compact w-64 p-2 shadow bg-base-100 border border-base-300 ml-2">
                         <img src={book.titlePage} className="w-full h-auto rounded-lg" alt={book.bookName} />
                         <div className="card-body p-2">
                           <h3 className="card-title mx-auto text-sm">{book.bookName}</h3>
@@ -281,7 +334,10 @@ export const LibrarianDashboard = () => {
                   </td>
                   <td className="py-4">
                     <div className="space-y-1">
-                      <p className="text-[21px] bookName">{book.bookName}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-[21px] bookName">{book.bookName}</p>
+                      </div>
+
                       <p className="text-sm">
                         <span className="font-semibold text-[18px]">مصنف:</span>
                         <span className="text-[16px] mr-1">
@@ -304,17 +360,27 @@ export const LibrarianDashboard = () => {
                           {book.bookNumber}
                         </span>
                       </p>
+                      <p>
+                        <span className="font-semibold text-[18px]">مکتبہ:</span>
+                        <span className="text-[16px] mr-1">
+                          {book.publisher}
+                        </span>
+                      </p>
                     </div>
                   </td>
-                  <td className="py-4 text-sm font-semibold">
-                    <a
-                      href={book.bookLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn btn-ghost btn-square text-neutral"
+                  <td className="py-4">
+                    <button
+                      className="btn btn-outline btn-accent flex items-center justify-center gap-2 font-sans"
+                      onClick={() => {
+                        if (book.bookLink) {
+                          window.open(book.bookLink, '_blank', 'noopener,noreferrer');
+                        } else {
+                          toast.error("!کتاب کا لنک موجود نہیں ہے");
+                        }
+                      }}
                     >
-                      <Download size={20} />
-                    </a>
+                      Download <Download size={20} />
+                    </button>
                   </td>
 
                   <td className="py-4 text-center">
