@@ -10,7 +10,9 @@ export const DeleteReader = ({ readerId }) => {
         if (window.confirm("Are you sure you want to delete this reader?")) {
             try {
                 await deleteDoc(doc(firestore, 'readers', readerId));
+                document.getElementById('reader_modal').close();
                 toast.success("Reader deleted successfully");
+
             } catch (err) {
                 toast.error("Failed to delete reader");
             }
@@ -19,7 +21,7 @@ export const DeleteReader = ({ readerId }) => {
     return (
         <button
             onClick={() => handleDeleteReader(readerId)}
-            className="btn btn-sm btn-error"
+            className="btn btn-dash btn-sm btn-error"
         >
             <Trash size={14} />
         </button>

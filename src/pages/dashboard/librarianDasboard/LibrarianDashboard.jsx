@@ -1,17 +1,15 @@
 import { firestore } from '@/config/Firebase'
 import imageCompression from 'browser-image-compression'
 import { addDoc, collection, doc, onSnapshot, orderBy, query, updateDoc } from 'firebase/firestore'
-import { EllipsisVertical } from 'lucide-react'
-import { SquarePen } from 'lucide-react'
 import { SquarePlus } from 'lucide-react'
-import { Download } from 'lucide-react'
+import { SearchX } from 'lucide-react'
 import React from 'react'
 import { useEffect } from 'react'
 import { useRef, useState } from 'react'
 import toast from 'react-hot-toast'
-import { DeleteBook } from './DeleteBook'
 import { DeleteReader } from './DeleteReader'
 import { SearchBooks } from '@/components/searchBooks/SearchBooks'
+import { BooksTable } from '@/components/booksTable/BooksTable'
 const initialState = {
   bookName: '',
   author: '',
@@ -210,23 +208,23 @@ export const LibrarianDashboard = () => {
     });
 
   return (
-    <div className="card card-side bg-base-100 shadow-xl m-4 w-[80%] mx-auto min-h-100vh">
-      <div className="card-body">
+    <div className="card card-side bg-base-100  shadow-xl m-4 w-[80%] mx-auto min-h-100vh">
+      <div className="card-body zain-light">
         <div className="btn-and-heading flex justify-between items-center">
-          <h2 className="card-title text-2xl font-bold mt-3 mb-5">Librarian Dashboard</h2>
-          <div className="flex gap-2 mb-5">
+          <h2 className="card-title text-2xl font-bold mt-3 mb-5 font-sans">Librarian Dashboard</h2>
+          <div className="flex gap-2 mb-5 font-sans">
             <button className="btn btn-neutral" onClick={() => document.getElementById('reader_modal').showModal()}>Manage Readers</button>
             <button className="btn btn-neutral " onClick={() => { setEditingBookId(null); setState(initialState); document.getElementById('my_modal_4').showModal() }}>Add New Book<SquarePlus /></button>
           </div>
           <dialog id="my_modal_4" className="modal" dir='rtl'>
             <div className="modal-box w-11/12 max-w-5xl">
               <button className="btn btn-error btn-soft btn-circle text-lg absolute right-2 top-4" onClick={() => { document.getElementById('my_modal_4').close(); setEditingBookId(null); setState(initialState); }}>✕</button>
-              <h1 className="font-bold text-end text-2xl text-neutral">{editingBookId ? 'Edit Book' : 'Add Books'}</h1>
+              <h1 className="font-bold text-end text-2xl text-neutral font-sans">{editingBookId ? 'Edit Book' : 'Add Books'}</h1>
               <form className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4" onSubmit={handleSubmit}>
                 <input type="text" required placeholder="نام کتاب" value={state.bookName} onChange={handleChange} name='bookName' id='bookName' className="input file-input-lg input-bordered w-full" />
                 <input type="text" required placeholder="مصنف" value={state.author} name='author' onChange={handleChange} id='author' className="input file-input-lg input-bordered w-full" />
                 <input type="text" placeholder="کتاب لنک" value={state.bookLink} name='bookLink' onChange={handleChange} id='bookLink' className="input file-input-lg input-bordered w-full" />
-                <input type="text" required placeholder="قسم" value={state.subject} name='subject' onChange={handleChange} id='subject' className="input file-input-lg input-bordered w-full" />
+                <input type="text" required placeholder="مضمون" value={state.subject} name='subject' onChange={handleChange} id='subject' className="input file-input-lg input-bordered w-full" />
                 <input type="text" required placeholder="کتاب نمبر" value={state.bookNumber} name='bookNumber' onChange={handleChange} id='bookNumber' className="input file-input-lg input-bordered w-full" />
                 <input type="file" ref={fileInputRef} placeholder="ٹائٹل پیج" name='titlePage' onChange={handleChange} id='titlePage' className="file-input file-input-lg file-input-bordered w-full " />
                 <select name='status' required id='status' value={state.status || ""} onChange={handleChange} className="select select-lg select-bordered w-full">
@@ -234,11 +232,11 @@ export const LibrarianDashboard = () => {
                   <option value="library" defaultValue={true}>لائبریری</option>
                 </select>
                 <input type="text" placeholder="مکبتہ" value={state.publisher} name='publisher' onChange={handleChange} id='publisher' className="input file-input-lg input-bordered w-full " />
-                <div className='mt-3 w-full flex justify-center md:col-span-2'>
+                <div className='mt-3 w-full flex justify-center md:col-span-2 font-sans'>
                   <button dir='ltr' className="btn btn-neutral btn-wide" type='submit' disabled={loading}>
                     {loading ? (
                       <>
-                        <span className="loading loading-spinner loading-md"></span>
+                        <span className="loading loading-spinner loading-md "></span>
                         <span>Processing...</span>
                       </>
                     ) : (
@@ -275,159 +273,27 @@ export const LibrarianDashboard = () => {
             </select>
           </div>
         </div>
-        <div className="overflow-x-auto max-h-[60vh]" dir="rtl">
-          <table className="table w-full noto-naskh-arabic-font">
-            <thead className="bg-neutral sticky top-0 z-10 text-neutral-content">
-              <tr>
-                <th className="w-10">#</th>
-                <th className="w-20">تصویر</th>
-                <th className="w-60">کتاب</th>
-                <th className="w-40">کتاب کی تفصیل</th>
-                <th className="w-30">کتاب ڈاؤن لوڈ</th>
-                <th className="w-40 text-center">اسٹیٹس</th>
-                <th className="w-24 text-center">ایکشن</th>
-              </tr>
-            </thead>
-            <tbody>
-              {books.length === 0 && !searchTerm ? (
-                [...Array(10)].map((_, i) => (
-                  <tr key={i} className="animate-pulse">
-                    <td><div className="h-4 w-4 bg-base-300 rounded"></div></td>
-                    <td><div className="h-14 w-14 bg-base-300 rounded-xl"></div></td>
-                    <td>
-                      <div className="h-4 w-32 bg-base-300 rounded mb-2"></div>
-                      <div className="h-3 w-24 bg-base-300 rounded"></div>
-                    </td>
-                    <td><div className="h-4 w-20 bg-base-300 rounded mb-2">
-                    </div><div className="h-4 w-16 bg-base-300 rounded"></div></td>
-                    <td><div className="h-4 w-12 bg-base-300 rounded"></div></td>
-                    <td><div className="h-8 w-36 bg-base-300 rounded mx-auto"></div></td>
-                    <td><div className="h-8 w-8 bg-base-300 rounded mx-auto"></div></td>
-                  </tr>
-                ))
-              ) : filteredBooks.map((book, index) => (
-                <tr
-                  key={book.id}
-                  className="border-b border-base-300 align-top hover:bg-base-200/40"
-                >
-                  <td className="py-4 font-bold">{index + 1}</td>
-                  <td className="py-4">
-                    <div className="dropdown dropdown-right dropdown-hover relative">
-                      {book.createdAt && (new Date() - book.createdAt.toDate()) / (1000 * 60 * 60 * 24) <= 15 && (
-                        <span className="badge badge-accent badge-sm font-sans animate-pulse absolute bottom-17 -right-7 z-8">
-                          NEW
-                        </span>
-                      )}
-                      <img
-                        tabIndex={0}
-                        src={book.titlePage}
-                        className="w-18 h-20 rounded-sm object-cover shadow cursor-pointer"
-                        alt={book.bookName}
-                      />
-                      <div tabIndex={0} className="dropdown-content z-100 card card-compact w-64 p-2 shadow bg-base-100 border border-base-300 ml-2">
-                        <img src={book.titlePage} className="w-full h-auto rounded-lg" alt={book.bookName} />
-                        <div className="card-body p-2">
-                          <h3 className="card-title mx-auto text-sm">{book.bookName}</h3>
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="py-4">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <p className="text-[21px] bookName">{book.bookName}</p>
-                      </div>
-
-                      <p className="text-sm">
-                        <span className="font-semibold text-[18px]">مصنف:</span>
-                        <span className="text-[16px] mr-1">
-                          {book.author}
-                        </span>
-                      </p>
-                    </div>
-                  </td>
-                  <td className="py-4">
-                    <div className="space-y-1 text-sm">
-                      <p>
-                        <span className="font-semibold text-[18px]">قسم:</span>
-                        <span className="text-[16px] mr-1">
-                          {book.subject}
-                        </span>
-                      </p>
-                      <p>
-                        <span className="font-semibold text-[18px]">کتاب نمبر:</span>
-                        <span className="text-[16px] mr-1">
-                          {book.bookNumber}
-                        </span>
-                      </p>
-                      <p>
-                        <span className="font-semibold text-[18px]">مکتبہ:</span>
-                        <span className="text-[16px] mr-1">
-                          {book.publisher}
-                        </span>
-                      </p>
-                    </div>
-                  </td>
-                  <td className="py-4">
-                    <button
-                      className="btn btn-outline btn-accent flex items-center justify-center gap-2 font-sans"
-                      onClick={() => {
-                        if (book.bookLink) {
-                          window.open(book.bookLink, '_blank', 'noopener,noreferrer');
-                        } else {
-                          toast.error("!کتاب کا لنک موجود نہیں ہے");
-                        }
-                      }}
-                    >
-                      Download <Download size={20} />
-                    </button>
-                  </td>
-
-                  <td className="py-4 text-center">
-                    <select
-                      className={`select select-sm w-36 ${book.status === 'library'
-                        ? 'select-success'
-                        : 'select-error'
-                        }`}
-                      value={book.status}
-                      onChange={(e) => updateStatus(book.id, e.target.value)}
-                    >
-                      <option value="library">لائبریری</option>
-                      {readers.map((reader) => (
-                        <option key={reader.id} value={reader.name}>
-                          {reader.name}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-
-                  {/* Actions */}
-                  <td className="pt-6 text-center">
-                    <div className="dropdown dropdown-left">
-                      <button className="btn btn-ghost btn-sm">
-                        <EllipsisVertical />
-                      </button>
-                      <ul className="dropdown-content menu shadow bg-base-100 rounded-box w-20">
-                        <li>
-                          <button className='btn btn-neutral' onClick={() => handleEditBook(book)}>
-                            <SquarePen size={14} />
-                          </button>
-                        </li>
-                        <li>
-                          <DeleteBook bookId={book.id} />
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <BooksTable
+          loading={books.length === 0 && !searchTerm}
+          books={filteredBooks}
+          readers={readers}
+          updateStatus={updateStatus}
+          handleEditBook={handleEditBook}
+          searchTerm={searchTerm}
+        />
+        {!loading && books.length > 0 && filteredBooks.length === 0 && (
+          <div className="py-20 text-center">
+            <SearchX size={64} className="mx-auto mb-4 text-base-content/20" />
+            <h3 className="text-3xl font-bold text-base-content/50">  معذرت! الفاظ "{searchTerm}" کے مطابق کتاب یا مصف نہیں ہے۔</h3>
+            <h3 className="text-2xl mt-2 font-bold text-base-content/40">
+              براہ کرم الفاظ بدل کر سرچ کریں۔
+            </h3>
+          </div>
+        )}
       </div >
 
       {/* Add new reader modal */}
-      <dialog id="reader_modal" className="modal">
+      <dialog id="reader_modal" className="modal font-sans">
         <div className="modal-box max-w-sm " >
           <form method="dialog">
             <button className="btn btn-sm btn-circle btn-ghost absolute btn-error right-2 top-2">✕</button>
