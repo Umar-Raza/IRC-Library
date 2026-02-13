@@ -15,7 +15,7 @@ const initialState = {
   author: '',
   bookLink: '',
   subject: '',
-  bookNumber: '',
+  libraryCode: '',
   titlePage: null, status: '',
   publisher: '',
 }
@@ -87,7 +87,7 @@ export const LibrarianDashboard = () => {
           ...restOfData,
           titlePage: imageUrl,
         });
-        toast.success('Book updated successfully');
+        toast.success('!کتاب اپڈیٹ ہوگئی ہے');
       } else {
         // Add new book
         await addDoc(collection(firestore, 'books'), {
@@ -95,7 +95,7 @@ export const LibrarianDashboard = () => {
           titlePage: imageUrl,
           createdAt: new Date(),
         });
-        toast.success('Book added successfully');
+        toast.success('!کتاب ایڈ ہوگئی ہے');
       }
 
       document.getElementById('my_modal_4').close()
@@ -175,7 +175,7 @@ export const LibrarianDashboard = () => {
       author: book.author || '',
       bookLink: book.bookLink || '',
       subject: book.subject || '',
-      bookNumber: book.bookNumber || '',
+      libraryCode: book.libraryCode || '',
       titlePage: book.titlePage || null,
       status: book.status || '',
       publisher: book.publisher || '',
@@ -225,7 +225,7 @@ export const LibrarianDashboard = () => {
                 <input type="text" required placeholder="مصنف" value={state.author} name='author' onChange={handleChange} id='author' className="input file-input-lg input-bordered w-full" />
                 <input type="text" placeholder="کتاب لنک" value={state.bookLink} name='bookLink' onChange={handleChange} id='bookLink' className="input file-input-lg input-bordered w-full" />
                 <input type="text" required placeholder="مضمون" value={state.subject} name='subject' onChange={handleChange} id='subject' className="input file-input-lg input-bordered w-full" />
-                <input type="text" required placeholder="کتاب نمبر" value={state.bookNumber} name='bookNumber' onChange={handleChange} id='bookNumber' className="input file-input-lg input-bordered w-full" />
+                <input type="text" required placeholder="لائبریری کوڈ" value={state.libraryCode} name='libraryCode' onChange={handleChange} id='libraryCode' className="input file-input-lg input-bordered w-full" />
                 <input type="file" ref={fileInputRef} placeholder="ٹائٹل پیج" name='titlePage' onChange={handleChange} id='titlePage' className="file-input file-input-lg file-input-bordered w-full " />
                 <select name='status' required id='status' value={state.status || ""} onChange={handleChange} className="select select-lg select-bordered w-full">
                   <option value="" required disabled={true}>اسٹیٹس</option>
@@ -280,6 +280,7 @@ export const LibrarianDashboard = () => {
           updateStatus={updateStatus}
           handleEditBook={handleEditBook}
           searchTerm={searchTerm}
+          isAdmin={true}
         />
         {!loading && books.length > 0 && filteredBooks.length === 0 && (
           <div className="py-20 text-center">
@@ -311,12 +312,21 @@ export const LibrarianDashboard = () => {
           </div>
           <div className="mt-4 max-h-40 overflow-y-auto border rounded-lg p-2">
             <p className="text-xs font-bold mb-2 text-gray-500">Existing Readers (Click trash to delete):</p>
-            {readers.map((reader) => (
-              <div key={reader.id} className="flex justify-between items-center p-1 hover:bg-base-200 rounded" dir="rtl">
-                <span className="text-sm">{reader.name}</span>
-                <DeleteReader readerId={reader.id} />
-              </div>
-            ))}
+            {readers.length === 0 ? (
+              [...Array(3)].map((_, i) => (
+                <div key={i} className="flex justify-between items-center p-2 animate-pulse">
+                  <div className="h-4 w-24 bg-base-300 rounded"></div>
+                  <div className="h-8 w-8 bg-base-300 rounded"></div>
+                </div>
+              ))
+            ) : (
+              readers.map((reader) => (
+                <div key={reader.id} className="flex justify-between items-center p-1 hover:bg-base-200 rounded" dir="rtl">
+                  <span className="text-sm">{reader.name}</span>
+                  <DeleteReader readerId={reader.id} />
+                </div>
+              ))
+            )}
           </div>
           <div className="modal-action flex justify-center gap-2">
             <button className="btn btn-neutral btn-wide" onClick={handleAddNewReaderSubmit} disabled={loading}>

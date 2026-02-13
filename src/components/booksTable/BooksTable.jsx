@@ -3,8 +3,8 @@ import { Download, EllipsisVertical, SquarePen } from 'lucide-react'
 import { DeleteBook } from '@/pages/dashboard/librarianDasboard/DeleteBook';
 import { toast } from 'react-hot-toast';
 
-export const BooksTable = ({ books, readers, updateStatus, handleEditBook, loading }) => {
-  
+export const BooksTable = ({ books, readers, updateStatus, handleEditBook, loading, isAdmin = false }) => {
+
   const SkeletonRow = () => (
     <tr className="animate-pulse">
       <td><div className="h-4 w-4 bg-base-300 rounded"></div></td>
@@ -14,114 +14,125 @@ export const BooksTable = ({ books, readers, updateStatus, handleEditBook, loadi
         <div className="h-3 w-24 bg-base-300 rounded"></div>
       </td>
       <td>
-        <div className="h-4 w-20 bg-base-300 rounded mb-2"></div>
+        <div className="h-3 w-24 bg-base-300 rounded"></div>
+        <div className="h-4 w-20 bg-base-300 rounded mb-2 mt-2"></div>
         <div className="h-4 w-16 bg-base-300 rounded"></div>
       </td>
-      <td><div className="h-4 w-12 bg-base-300 rounded"></div></td>
+      <td><div className="h-8 w-27 bg-base-300 rounded"></div></td>
       <td><div className="h-8 w-36 bg-base-300 rounded mx-auto"></div></td>
-      <td><div className="h-8 w-8 bg-base-300 rounded mx-auto"></div></td>
+      {isAdmin && <td><div className="h-8 w-8 bg-base-300 rounded mx-auto"></div></td>}
     </tr>
   );
 
   return (
-    <div className="overflow-x-auto max-h-[60vh]" dir="rtl">
-      <table className="table w-full zain-light">
-        <thead className="bg-neutral sticky top-0 z-10 text-neutral-content">
-          <tr>
-            <th className="w-10">#</th>
-            <th className="w-20">تصویر</th>
-            <th className="w-60">کتاب</th>
-            <th className="w-40">کتاب کی تفصیل</th>
-            <th className="w-30 " >کتاب ڈاؤن لوڈ</th>
-            <th className="w-40 text-center">اسٹیٹس</th>
-            <th className="w-24 text-center">ایکشن</th>
-          </tr>
-        </thead>
-        <tbody>
-          {loading ? (
-            [...Array(10)].map((_, i) => <SkeletonRow key={i} />)
-          ) : (
-            books.map((book, index) => (
-              <tr key={book.id} className="border-b border-base-300 align-top hover:bg-base-200/40">
-                <td className="py-4 font-bold">{index + 1}</td>
-                <td className="py-4">
-                  <div className="dropdown dropdown-right dropdown-hover relative">
-                    {book.createdAt && (new Date() - book.createdAt.toDate()) / (1000 * 60 * 60 * 24) <= 15 && (
-                      <span className="badge badge-accent badge-sm font-sans animate-pulse absolute bottom-17 -right-7 z-8">NEW</span>
-                    )}
-                    <img
-                      src={book.titlePage}
-                      className="w-18 h-20 rounded-sm object-cover shadow cursor-pointer"
-                      alt={book.bookName}
-                    />
-                    <div className="dropdown-content z-[999] card card-compact w-64 p-2 shadow bg-base-100 border border-base-300 ml-2">
-                      <img src={book.titlePage} className="w-full h-auto rounded-lg" alt={book.bookName} />
-                      <div className="card-body p-2">
-                        <h3 className="card-title mx-auto text-sm">{book.bookName}</h3>
+    <>
+      <div className="text-center mb-1">
+        <span className="text-lg zain-light">اسلامک ریسرچ سینٹر فیصل آباد میں کل : <span className="font-bold"> {books.length}</span> مجلدات موجود ہیں۔</span>
+      </div>
+
+      <div className="overflow-x-auto max-h-[60vh]" dir="rtl">
+        <table className="table w-full zain-light">
+          <thead className="bg-neutral sticky top-0 z-10 text-neutral-content">
+            <tr>
+              <th className="w-10">#</th>
+              <th className="w-20">تصویر</th>
+              <th className="w-60">کتاب</th>
+              <th className="w-40">کتاب کی تفصیل</th>
+              <th className="w-30 " >کتاب ڈاؤن لوڈ</th>
+              <th className="w-40 text-center">اسٹیٹس</th>
+              {/* <th className="w-24 text-center">ایکشن</th> */}
+              {isAdmin && <th className="w-24 text-center">ایکشن</th>}
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              [...Array(10)].map((_, i) => <SkeletonRow key={i} />)
+            ) : (
+              books.map((book, index) => (
+                <tr key={book.id} className="border-b border-base-300 align-top hover:bg-base-200/40">
+                  <td className="py-4 font-bold">{index + 1}</td>
+                  <td className="py-4">
+                    <div className="dropdown dropdown-right dropdown-hover relative">
+                      {book.createdAt && (new Date() - book.createdAt.toDate()) / (1000 * 60 * 60 * 24) <= 15 && (
+                        <span className="badge badge-accent badge-sm font-sans animate-pulse absolute bottom-17 -right-7 z-8">NEW</span>
+                      )}
+                      <img
+                        src={book.titlePage}
+                        className="w-18 h-21 rounded-sm object-cover shadow cursor-pointer"
+                        alt={book.bookName}
+                      />
+                      <div className="dropdown-content z-[999] card card-compact w-48 p-1 shadow bg-base-100 border border-base-300 ml-2">
+                        <img src={book.titlePage} className="w-48 h-64  rounded-lg" alt={book.bookName} />
+                        <div className="card-body p-2">
+                          <h3 className="card-title mx-auto text-sm">{book.bookName}</h3>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </td>
-                <td className="py-4">
-                  <div className="space-y-1">
-                    <p className="text-[19px] bookName font-bold">{book.bookName}</p>
-                    <p className="text-sm">
-                      <span className="font-semibold text-[16px]">مصنف:</span>
-                      <span className="text-[15px] mr-1">{book.author}</span>
-                    </p>
-                  </div>
-                </td>
-                <td className="py-4">
-                  <div className="space-y-1 text-sm">
-                    <p><span className="font-semibold text-[16px]">قسم:</span> <span className="text-[15px] mr-1">{book.subject}</span></p>
-                    <p><span className="font-semibold text-[16px]">کتاب نمبر:</span> <span className="text-[15px] mr-1">{book.bookNumber}</span></p>
-                    <p><span className="font-semibold text-[16px]">مکتبہ:</span> <span className="text-[15px] mr-1">{book.publisher}</span></p>
-                  </div>
-                </td>
-                <td className="py-4 text-center">
-                  <button
-                    className="btn btn-outline btn-accent flex items-center justify-center gap-2 font-sans"
-                    onClick={() => {
-                      if (book.bookLink) {
-                        window.open(book.bookLink, '_blank');
-                      } else {
-                        toast.error("!کتاب موجود نہیں ہے");
-                      }
-                    }}
-                  >
-                    Download <Download size={20} />
-                  </button>
-                </td>
-                <td className="py-4 text-center">
-                  <select
-                    className={`select select-sm w-36 ${book.status === 'library' ? 'select-success' : 'select-error'}`}
-                    value={book.status}
-                    onChange={(e) => updateStatus(book.id, e.target.value)}
-                  >
-                    <option value="library text-[15px]">لائبریری</option>
-                    {readers.map((reader) => (
-                      <option key={reader.id} value={reader.name}>{reader.name}</option>
-                    ))}
-                  </select>
-                </td>
-                <td className="pt-6 text-center">
-                  <div className="dropdown dropdown-left">
-                    <button className="btn btn-ghost btn-sm"><EllipsisVertical /></button>
-                    <ul className="dropdown-content menu shadow bg-base-100 rounded-box w-20">
-                      <li>
-                        <button className='btn btn-neutral' onClick={() => handleEditBook(book)}>
-                          <SquarePen size={14} />
-                        </button>
-                      </li>
-                      <li><DeleteBook bookId={book.id} /></li>
-                    </ul>
-                  </div>
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-    </div>
+                  </td>
+                  <td className="py-4">
+                    <div className="space-y-1">
+                      <p className="text-[19px] bookName font-bold">{book.bookName}</p>
+                      <p className="text-sm">
+                        <span className="font-semibold text-[16px]">مصنف:</span>
+                        <span className="text-[15px] mr-1">{book.author}</span>
+                      </p>
+                    </div>
+                  </td>
+                  <td className="py-4">
+                    <div className="space-y-1 text-sm">
+                      <p><span className="font-semibold text-[16px]">مضمون:</span> <span className="text-[15px] mr-1">{book.subject}</span></p>
+                      <p><span className="font-semibold text-[16px]">لائبریری کوڈ:</span> <span className="text-[15px] mr-1">{book.libraryCode}</span></p>
+                      <p><span className="font-semibold text-[16px]">مکتبہ:</span> <span className="text-[15px] mr-1">{book.publisher}</span></p>
+                    </div>
+                  </td>
+                  <td className="py-4 text-center">
+                    <button
+                      className="btn btn-outline btn-accent flex items-center justify-center gap-2 font-sans"
+                      onClick={() => {
+                        if (book.bookLink) {
+                          window.open(book.bookLink, '_blank');
+                        } else {
+                          toast.error("!کتاب موجود نہیں ہے");
+                        }
+                      }}
+                    >
+                      Download <Download size={20} />
+                    </button>
+                  </td>
+                  <td className="py-4 text-center">
+                    <select
+                      className={`select select-sm w-36 ${book.status === 'library' ? 'select-success' : 'select-error'}`}
+                      value={book.status}
+                      onChange={(e) => updateStatus(book.id, e.target.value)}
+                    >
+                      <option value="library">لائبریری</option>
+                      {readers.map((reader) => (
+                        <option key={reader.id} value={reader.name}>{reader.name}</option>
+                      ))}
+                    </select>
+                  </td>
+                  {isAdmin && (
+
+                    <td className="pt-6 text-center">
+                      <div className="dropdown dropdown-left">
+                        <button className="btn btn-ghost btn-sm"><EllipsisVertical /></button>
+                        <ul className="dropdown-content menu shadow bg-base-100 rounded-box w-20">
+                          <li>
+                            <button className='btn btn-neutral' onClick={() => handleEditBook(book)}>
+                              <SquarePen size={14} />
+                            </button>
+                          </li>
+                          <li><DeleteBook bookId={book.id} /></li>
+                        </ul>
+                      </div>
+                    </td>
+                  )}
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </>
   )
 }
