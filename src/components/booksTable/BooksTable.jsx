@@ -40,7 +40,6 @@ export const BooksTable = ({ books, readers, updateStatus, handleEditBook, loadi
               <th className="w-40">کتاب کی تفصیل</th>
               <th className="w-30 " >کتاب ڈاؤن لوڈ</th>
               <th className="w-40 text-center">اسٹیٹس</th>
-              {/* <th className="w-24 text-center">ایکشن</th> */}
               {isAdmin && <th className="w-24 text-center">ایکشن</th>}
             </tr>
           </thead>

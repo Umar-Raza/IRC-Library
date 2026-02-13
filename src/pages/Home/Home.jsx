@@ -68,18 +68,12 @@ export const Home = () => {
     return (
         <div className="card card-side bg-base-100 shadow-xl m-4 w-[80%] mx-auto min-h-screen">
             <div className="card-body">
-                {/* ہیڈنگ سیکشن */}
                 <div className="flex justify-between items-center border-b pb-4 mb-6">
                     <h2 className="card-title text-3xl font-bold noto-naskh-arabic-font text-neutral">اسلامک ریسرچ سینٹر لائبریری</h2>
                 </div>
-
-                {/* سرچ، فلٹر اور سورٹنگ بار (وہی ڈیزائن جو ڈیش بورڈ میں تھا) */}
                 <div className="bg-base-100 rounded-xl  shadow border border-base-300 p-4 mb-1" dir="rtl">
                     <div className="flex flex-col md:flex-row gap-4">
-                        {/* سرچ کمپوننٹ */}
                         <SearchBooks onSearch={(value) => setSearchTerm(value)} />
-
-                        {/* سبجیکٹ فلٹر */}
                         <select
                             className="select select-bordered w-full md:w-1/5 text-[16px]"
                             value={subjectFilter}
@@ -90,8 +84,6 @@ export const Home = () => {
                                 <option key={subject} value={subject}>{subject}</option>
                             ))}
                         </select>
-
-                        {/* سورٹنگ سلیکٹ باکس */}
                         <select
                             className="select select-bordered w-full md:w-1/5 text-[16px]"
                             value={sortOrder}
@@ -104,10 +96,7 @@ export const Home = () => {
                         </select>
                     </div>
                 </div>
-
-                {/* ٹیبل سیکشن */}
                 <div className="relative">
-                    {/* اگر رزلٹ نہ ملے تو یہ دکھاؤ */}
                     {!loading && filteredBooks.length === 0 ? (
                         <div className="py-20 text-center bg-base-200/20 rounded-xl">
                             <SearchX size={64} className="mx-auto mb-4 text-base-content/20" />
