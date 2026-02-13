@@ -37,7 +37,7 @@ export const SearchBooks = ({ onSearch }) => {
         type="search"
         className="grow"
         placeholder="کتاب یا مصنف سرچ کریں۔۔۔"
-        onFocus={(e) => (e.target.placeholder = "اردو کی بورڈ منتخب کریں")}
+        onFocus={(e) => (e.target.placeholder = "اردو کی بورڈ منتخب کریں۔۔۔")}
         onBlur={(e) => (e.target.placeholder = "کتاب یا مصنف سرچ کریں۔۔۔")}
         onChange={(e) => onSearch && onSearch(e.target.value)}
       />

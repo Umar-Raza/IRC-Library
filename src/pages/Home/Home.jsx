@@ -24,7 +24,6 @@ export const Home = () => {
     }, []);
 
     useEffect(() => {
-        // ڈیٹا بیس سے رئیل ٹائم ڈیٹا حاصل کرنا
         const q = query(collection(firestore, 'books'), orderBy('createdAt', 'desc'));
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -43,8 +42,6 @@ export const Home = () => {
             toast.error("Status update failed!");
         }
     };
-
-    // فلٹر اور سورٹنگ لاجک (بالکل ڈیش بورڈ کی طرح)
     const filteredBooks = books
         .filter((book) => {
             const searchLower = searchTerm.toLowerCase();
@@ -66,12 +63,13 @@ export const Home = () => {
         });
 
     return (
-        <div className="card card-side bg-base-100 shadow-xl m-4 w-[80%] mx-auto min-h-screen">
+        <div className="card card-side bg-base-100 shadow-xl m-4 w-[80%] mx-auto">
+
             <div className="card-body">
-                <div className="flex justify-between items-center border-b pb-4 mb-6">
-                    <h2 className="card-title text-3xl font-bold noto-naskh-arabic-font text-neutral">اسلامک ریسرچ سینٹر لائبریری</h2>
+                <div className="text-center mb-1">
+                    <span className="text-lg zain-light text-neutral">اسلامک ریسرچ سینٹر فیصل آباد میں کل : <span className="font-bold"> {books.length}</span> مجلدات موجود ہیں۔</span>
                 </div>
-                <div className="bg-base-100 rounded-xl  shadow border border-base-300 p-4 mb-1" dir="rtl">
+                <div className="bg-base-100 rounded-xl  shadow border border-base-300 p-4 mb-2" dir="rtl">
                     <div className="flex flex-col md:flex-row gap-4">
                         <SearchBooks onSearch={(value) => setSearchTerm(value)} />
                         <select
