@@ -364,22 +364,21 @@ export const LibrarianDashboard = () => {
           </div>
         </div>
       </dialog>
-
-      <dialog id="issued_books_modal" className="modal font-sans">
-        <div className="modal-box w-11/12 max-w-3xl">
+      <dialog id="issued_books_modal" className="modal font-sans w-full">
+        <div className="modal-box w-11/12 max-w-3xl ">
           <form method="dialog">
             <button className="btn btn-sm btn-circle btn-error btn-ghost absolute right-2 top-2">✕</button>
           </form>
           <h3 className="font-bold text-2xl mb-6 text-center text-neutral">Issued Books by Reader</h3>
 
           {/* Issued book readers list */}
-          <div className="overflow-x-auto zain-light">
-            <table className="table w-full" dir="rtl">
+          <div className="overflow-y-auto max-h-[70vh] mx-auto zain-light rounded-lg shadow " dir="rtl">
+            <table className="table w-full" >
               <thead>
-                <tr className="text-right text-base-100 bg-neutral">
-                  <th className="text-lg">ریڈر کا نام</th>
-                  <th className="text-lg">جاری کردہ کتابیں</th>
-                  <th className="text-lg text-center">ایکشن</th>
+                <tr className="text-right text-base-100 bg-neutral sticky top-0 z-10">
+                  <th className="text-lg w-2.5">ریڈر کا نام</th>
+                  <th className="text-lg ">جاری کردہ کتابیں</th>
+                  <th className="text-lg text-center w-4.5">ایکشن</th>
                 </tr>
               </thead>
               <tbody>

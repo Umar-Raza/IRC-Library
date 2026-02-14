@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 
 export const Navbar = () => {
     return (
-        <header className="navbar shadow-sm px-7.5 w-full flex items-center justify-between sticky top-0 z-50 bg-base-100">
+        <header className="navbar shadow-sm px-7.5 w-full flex items-center  justify-between sticky top-0 z-50 bg-base-100">
             <div className="navbar-start">
                 <div className="dropdown">
                     <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -27,7 +27,7 @@ export const Navbar = () => {
                 </ul>
             </div>
             <div className="navbar-end">
-                <Link to="/librarian-dashboard" className="btn btn-md btn-neutral">Login <LogIn size={20} /></Link>
+                <Link to="/librarian-login" className="btn btn-md btn-neutral">Login <LogIn size={20} /></Link>
             </div>
         </header>
     )
