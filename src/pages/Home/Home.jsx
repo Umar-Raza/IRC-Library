@@ -68,14 +68,11 @@ export const Home = () => {
             return 0;
         });
 
-
     useEffect(() => {
         const handleClickOutside = (event) => {
-            // مضامین والا مینو بند کریں
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
                 setIsDropdownOpen(false);
             }
-            // سورٹنگ والا مینو بند کریں
             if (sortRef.current && !sortRef.current.contains(event.target)) {
                 setIsSortOpen(false);
             }
@@ -84,17 +81,16 @@ export const Home = () => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // مضامین کی لسٹ تیار کرنا (Unique Subjects)
     const allSubjects = [...new Set(books.map(book => book.subject))].filter(Boolean);
     const filteredSubjects = allSubjects.filter(s =>
         s.toLowerCase().includes(subjectSearch.toLowerCase())
     );
 
     return (
-        <div className="card card-side bg-base-100  zain-light shadow-xl m-4 w-[80%] mx-auto">
+        <div className="card card-side bg-base-100 zain-light shadow-xl m-4 w-[80%] mx-auto">
             <div className="card-body">
                 <div className="text-center mb-1">
-                    <span className="text-lg  text-neutral">اسلامک ریسرچ سینٹر فیصل آباد میں کل : <span className="font-bold"> {books.length}</span> مجلدات موجود ہیں۔</span>
+                    <span className="text-lg text-neutral">اسلامک ریسرچ سینٹر فیصل آباد میں کل : <span className="font-bold"> {books.length}</span> مجلدات موجود ہیں۔</span>
                 </div>
                 <div className="bg-base-100 rounded-xl shadow  border border-base-300 p-4 mb-2" dir="rtl">
                     <div className="flex flex-col md:flex-row items-stretch gap-3">
@@ -158,7 +154,6 @@ export const Home = () => {
                             )}
                         </div>
                         <div className="relative w-full md:w-1/4 text-[16px]" ref={sortRef} dir="rtl">
-                            {/* سلیکٹ باکس جیسا ڈیزائن */}
                             <div
                                 className="input input-bordered flex items-center justify-between cursor-pointer bg-base-100 pr-4 pl-3"
                                 onClick={() => setIsSortOpen(!isSortOpen)}
@@ -173,7 +168,7 @@ export const Home = () => {
                             </div>
 
                             {isSortOpen && (
-                                <div className="absolute z-[100] w-full mt-1 bg-base-100  border border-base-300 rounded-lg shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200">
+                                <div className="absolute z-100 w-full mt-1 bg-base-100  border border-base-300 rounded-lg shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200">
                                     <ul className="p-1">
                                         {sortOptions.map((option) => (
                                             <li

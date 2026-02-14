@@ -207,12 +207,28 @@ export const LibrarianDashboard = () => {
       return 0;
     });
 
+  const handleReturnBook = async (bookId) => {
+    try {
+      const bookRef = doc(firestore, 'books', bookId);
+      await updateDoc(bookRef, { status: 'library' });
+      toast.success('کتاب لائبریری میں واپس جمع ہو گئی ہے');
+    } catch (err) {
+      toast.error('کتاب واپس کرنے میں مسئلہ پیش آیا ہے');
+    }
+  };
+
   return (
     <div className="card card-side bg-base-100  shadow-xl m-4 w-[80%] mx-auto min-h-100vh">
       <div className="card-body zain-light">
         <div className="btn-and-heading flex justify-between items-center">
           <h2 className="card-title text-2xl font-bold mt-3 mb-5 font-sans">Librarian Dashboard</h2>
           <div className="flex gap-2 mb-5 font-sans">
+            <button
+              className="btn btn-neutral"
+              onClick={() => document.getElementById('issued_books_modal').showModal()}
+            >
+              Issued Books List
+            </button>
             <button className="btn btn-neutral" onClick={() => document.getElementById('reader_modal').showModal()}>Manage Readers</button>
             <button className="btn btn-neutral " onClick={() => { setEditingBookId(null); setState(initialState); document.getElementById('my_modal_4').showModal() }}>Add New Book<SquarePlus /></button>
           </div>
@@ -249,28 +265,34 @@ export const LibrarianDashboard = () => {
           </dialog>
         </div>
         <div className="bg-base-100 rounded-xl shadow p-4 mb-4" dir="rtl">
-          <div className="flex flex-col md:flex-row gap-4">
-            <SearchBooks onSearch={(value) => setSearchTerm(value)} />
-            <select
-              className="select select-bordered w-full md:w-1/5"
-              value={subjectFilter}
-              onChange={(e) => setSubjectFilter(e.target.value)}
-            >
-              <option value="">تمام مضامین</option>
-              {[...new Set(books.map(book => book.subject))].filter(Boolean).map((subject) => (
-                <option key={subject} value={subject}>{subject}</option>
-              ))}
-            </select>
-            <select
-              className="select select-bordered w-full md:w-1/5"
-              value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value)}
-            >
-              <option>نئی کتابیں</option>
-              <option>پرانی کتابیں</option>
-              <option>ا → ے</option>
-              <option>ے → ا</option>
-            </select>
+          <div className="flex flex-col md:flex-row items-stretch gap-3">
+            <div className="flex-2 min-w-0">
+              <SearchBooks onSearch={(value) => setSearchTerm(value)} />
+            </div>
+            <span className='w-full md:w-1/4'>
+              <select
+                className="select select-bordered "
+                value={subjectFilter}
+                onChange={(e) => setSubjectFilter(e.target.value)}
+              >
+                <option value="">تمام مضامین</option>
+                {[...new Set(books.map(book => book.subject))].filter(Boolean).map((subject) => (
+                  <option key={subject} value={subject}>{subject}</option>
+                ))}
+              </select>
+            </span>
+            <span className='w-full md:w-1/4'>
+              <select
+                className="select select-bordered w-full md:w-1/4"
+                value={sortOrder}
+                onChange={(e) => setSortOrder(e.target.value)}
+              >
+                <option>نئی کتابیں</option>
+                <option>پرانی کتابیں</option>
+                <option>ا → ے</option>
+                <option>ے → ا</option>
+              </select>
+            </span>
           </div>
         </div>
         <BooksTable
@@ -342,6 +364,75 @@ export const LibrarianDashboard = () => {
           </div>
         </div>
       </dialog>
+
+      <dialog id="issued_books_modal" className="modal font-sans">
+        <div className="modal-box w-11/12 max-w-3xl">
+          <form method="dialog">
+            <button className="btn btn-sm btn-circle btn-error btn-ghost absolute right-2 top-2">✕</button>
+          </form>
+          <h3 className="font-bold text-2xl mb-6 text-center text-neutral">Issued Books by Reader</h3>
+
+          {/* Issued book readers list */}
+          <div className="overflow-x-auto zain-light">
+            <table className="table w-full" dir="rtl">
+              <thead>
+                <tr className="text-right text-base-100 bg-neutral">
+                  <th className="text-lg">ریڈر کا نام</th>
+                  <th className="text-lg">جاری کردہ کتابیں</th>
+                  <th className="text-lg text-center">ایکشن</th>
+                </tr>
+              </thead>
+              <tbody>
+                {readers.map((reader) => {
+                  const issuedBooks = books.filter(book => book.status === reader.name);
+                  return (
+                    <tr key={reader.id}>
+                      <td className="font-bold text-neutral align-top">{reader.name}</td>
+
+                      <td className="align-top">
+                        {issuedBooks.length > 0 ? (
+                          <ul className="space-y-2">
+                            {issuedBooks.map(book => (
+                              <li key={book.id} className="h-6 flex items-center">
+                                <span className="text-sm">
+                                  {book.bookName} <span className="text-gray-400 text-xs">({book.libraryCode})</span>
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <span className="text-neutral-400">-</span>
+                        )}
+                      </td>
+
+                      <td className="text-center align-top">
+                        {issuedBooks.length > 0 ? (
+                          <div className="flex flex-col gap-2 items-center">
+                            {issuedBooks.map(book => (
+                              <button
+                                key={book.id}
+                                className="btn btn-xs btn-success btn-outline btn-dash font-sans h-6 min-h-0"
+                                onClick={() => handleReturnBook(book.id)}
+                              >
+                                Return
+                              </button>
+                            ))}
+                          </div>
+                        ) : (
+                          <button className="btn btn-xs btn-disabled font-sans h-6 min-h-0" disabled>
+                            Return
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </dialog>
+
     </div >
   )
 };

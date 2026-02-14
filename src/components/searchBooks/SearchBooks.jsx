@@ -4,31 +4,24 @@ export const SearchBooks = ({ onSearch }) => {
   const inputRef = useRef(null);
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // 1. اگر صارف پہلے سے کسی ان پٹ یا ٹیکسٹ ایریا میں ٹائپ کر رہا ہو، تو شارٹ کٹ نہ چلے
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-        // اگر صارف ان پٹ کے اندر ہے اور 'Escape' دبائے تو فوکس ختم کر دے
         if (e.key === 'Escape') {
           inputRef.current?.blur();
         }
         return;
       }
 
-      // 2. Ctrl + K یا Command + K (فوکس کرنے کے لیے)
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault(); // براؤزر کے ڈیفالٹ سرچ بار کو روکنے کے لیے
+        e.preventDefault();
         inputRef.current?.focus();
       }
 
-      // 3. Forward Slash (/) (صرف سلیش دبانے سے سرچ بار فوکس ہو جائے گا)
       if (e.key === '/') {
-        e.preventDefault(); // سلیش کو ان پٹ کے اندر ٹائپ ہونے سے روکنے کے لیے
+        e.preventDefault();
         inputRef.current?.focus();
       }
     };
-
-    // 'keydown' ایونٹ براؤزر کے ڈیفالٹ ایکشن کو روکنے کے لیے بہترین ہے
     window.addEventListener('keydown', handleKeyDown);
-
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };

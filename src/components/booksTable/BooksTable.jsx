@@ -61,7 +61,7 @@ export const BooksTable = ({ books, readers, updateStatus, handleEditBook, loadi
                         <div className="w-18 h-21 bg-base-200 rounded-sm flex items-center justify-center text-[10px] text-center">{book.bookName}</div>
                       )}
 
-                      <div className="dropdown-content z-[999] card card-compact w-48 p-1 shadow bg-base-100 border border-base-300 ml-2">
+                      <div className="dropdown-content z-999 card card-compact w-48 p-1 shadow bg-base-100 border border-base-300 ml-2">
                         {book.titlePage ? (
                           <img src={book.titlePage || null} className="w-48 h-64 rounded-lg" alt={book.bookName} />
                         ) : (
