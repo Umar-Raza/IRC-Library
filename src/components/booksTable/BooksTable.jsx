@@ -1,5 +1,5 @@
 import React from 'react'
-import { BookOpen, BookOpenText, Download, EllipsisVertical, SquarePen } from 'lucide-react'
+import { Book, BookAIcon, BookOpen, BookOpenText, Download, EllipsisVertical, SquarePen } from 'lucide-react'
 import { DeleteBook } from '@/pages/dashboard/librarianDasboard/DeleteBook';
 import { toast } from 'react-hot-toast';
 
@@ -65,7 +65,7 @@ export const BooksTable = ({ books, readers, updateStatus, handleEditBook, loadi
                         {book.titlePage ? (
                           <img src={book.titlePage || null} className="w-48 h-64 rounded-lg" alt={book.bookName} />
                         ) : (
-                          <div className="w-48 h-21 bg-base-200 rounded-lg flex items-center justify-center"><BookOpenText size={32} className="text-base-400" /></div>
+                          <div className="w-46 h-20 bg-base-200 rounded-lg flex items-center justify-center"><Book size={32} className="text-base-400 " /></div>
                         )}
                         <div className="card-body p-2">
                           <h3 className="card-title mx-auto text-sm text-center">{book.bookName}</h3>
