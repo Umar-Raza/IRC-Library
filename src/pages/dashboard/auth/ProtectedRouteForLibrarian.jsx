@@ -6,7 +6,7 @@ export const ProtectedRouteForLibrarian = ({ children }) => {
 
     if (loading) return null; 
 
-    if (user && user.email === "umar@gmail.com") {
+    if (user && user.email === "almadinatulilmia.fsd@dawateislami.net") {
         return children;
     } else {
         return <Navigate to="/librarian-login" />;

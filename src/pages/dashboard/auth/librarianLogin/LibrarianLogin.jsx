@@ -30,7 +30,7 @@ export const LibrarianLogin = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const result = await signInWithEmailAndPassword(auth, formData.email, formData.password);
+       await signInWithEmailAndPassword(auth, formData.email, formData.password);
       toast.success("Login successful!");
       navigate('/librarian-dashboard');
     } catch (error) {
