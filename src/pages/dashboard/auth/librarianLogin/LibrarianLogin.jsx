@@ -1,57 +1,140 @@
-import React from 'react'
-import {Link} from 'react-router-dom'
+import { SquareLibrary, Eye, EyeOff, MailIcon, LockIcon, Loader } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { auth } from '@/config/Firebase'
+import { signInWithEmailAndPassword } from 'firebase/auth'
+import toast from 'react-hot-toast'
+import { useAuth } from '@/context/AuthContext'
+
 export const LibrarianLogin = () => {
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/librarian-dashboard');
+    }
+  }, [user, navigate]);
+
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const result = await signInWithEmailAndPassword(auth, formData.email, formData.password);
+      toast.success("Login successful!");
+      navigate('/librarian-dashboard');
+    } catch (error) {
+      // console.error("Login error:", error);
+      toast.error("LOGIN FAILED! Please check your credentials and try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
   return (
-    <div className=" font-sans">
-      <div className="min-h-screen flex flex-col  items-center justify-center py-6 px-4">
-        <div className="max-w-[480px] w-full">
-          <a href="javascript:void(0)"><img
-            src="https://readymadeui.com/readymadeui.svg" alt="logo" className="w-40 mb-8 mx-auto block" />
-          </a>
+    <div className="flex-1 flex items-center justify-center content-center p-4 overflow-hidden">
+      <div className="w-full max-w-md my-auto">
+        <div className="bg-base-100 p-6 sm:p-10 rounded-3xl border border-base-300 shadow-sm">
+          <div className="text-center mb-10">
+            <Link to='/'>
+              <div className='flex items-center justify-center gap-3 group mb-4 font-sans'>
+                <div className="bg-neutral p-1 rounded-xl shadow-lg group-hover:bg-[#457b9d] transition-all duration-300">
+                  <SquareLibrary className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                </div>
 
-          <div className="p-6 sm:p-8 rounded-2xl bg-base-100  border-accent-content shadow-md">
-            <h1 className="text-neutral text-center text-3xl font-semibold ">Log in</h1>
-            <form className="mt-12 space-y-6">
-              <div>
-                <label className="text-neutral text-sm font-medium mb-2 block">User name</label>
-                <div className="relative flex items-center">
-                  <input name="username" type="text" required className="w-full text-slate-900 text-sm border border-slate-300 px-4 py-3 pr-8 rounded-md outline-neutral" placeholder="Enter user name" />
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb" className="w-4 h-4 absolute right-4" viewBox="0 0 24 24">
-                    <circle cx="10" cy="7" r="6" data-original="#000000"></circle>
-                    <path d="M14 15H6a5 5 0 0 0-5 5 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 5 5 0 0 0-5-5zm8-4h-2.59l.3-.29a1 1 0 0 0-1.42-1.42l-2 2a1 1 0 0 0 0 1.42l2 2a1 1 0 0 0 1.42 0 1 1 0 0 0 0-1.42l-.3-.29H22a1 1 0 0 0 0-2z" data-original="#000000"></path>
-                  </svg>
-                </div>
+                <span className='text-2xl sm:text-3xl font-bold text-neutral group-hover:text-[#457b9d] transition-colors'>
+                  IRC Library
+                </span>
               </div>
-              <div>
-                <label className="text-neutral text-sm font-medium mb-2 block">Password</label>
-                <div className="relative flex items-center">
-                  <input name="password" type="password" required className="w-full text-slate-900 text-sm border border-slate-300 px-4 py-3 pr-8 rounded-md outline-neutral" placeholder="Enter password" />
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb" className="w-4 h-4 absolute right-4 cursor-pointer" viewBox="0 0 128 128">
-                    <path d="M64 104C22.127 104 1.367 67.496.504 65.943a4 4 0 0 1 0-3.887C1.367 60.504 22.127 24 64 24s62.633 36.504 63.496 38.057a4 4 0 0 1 0 3.887C126.633 67.496 105.873 104 64 104zM8.707 63.994C13.465 71.205 32.146 96 64 96c31.955 0 50.553-24.775 55.293-31.994C114.535 56.795 95.854 32 64 32 32.045 32 13.447 56.775 8.707 63.994zM64 88c-13.234 0-24-10.766-24-24s10.766-24 24-24 24 10.766 24 24-10.766 24-24 24zm0-40c-8.822 0-16 7.178-16 16s7.178 16 16 16 16-7.178 16-16-7.178-16-16-16z" data-original="#000000"></path>
-                  </svg>
+            </Link>
+          </div>
+          <form className="space-y-5" onSubmit={handleSubmit}>
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text font-semibold">Email Address</span>
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <MailIcon className="h-5 w-5 text-base-content/40 z-10" />
                 </div>
+                <input
+                  type="email"
+                  name="email"
+                  className="input input-bordered w-full pl-10 focus:input-neutral transition-all text-[16px]"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="name@example.com"
+                  required
+                />
               </div>
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                <div className="flex items-center">
-                  <input id="remember-me" name="remember-me" type="checkbox" className="h-4 w-4 shrink-0 text-blue-600 focus:ring-blue-500 border-neutral rounded" />
-                  <label for="remember-me" className="ml-3 block text-sm text-neutral">
-                    Remember me
-                  </label>
+            </div>
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text font-semibold">Password</span>
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <LockIcon className="h-5 w-5 text-base-content/40 z-10" />
                 </div>
-                <div className="text-sm">
-                  <a href="jajvascript:void(0);" className="text-primary hover:underline font-semibold">
-                    Forgot your password?
-                  </a>
-                </div>
-              </div>
-
-              <div className="mt-12">
-                <button type="button" className="w-full py-2 px-4 text-[15px] font-medium tracking-wide rounded-md text-white bg-neutral hover:bg-[#457b9d]  focus:outline-none cursor-pointer">
-                  Sign in
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  className="input input-bordered required w-full pl-10 pr-10 focus:input-neutral transition-all text-[16px]"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center hover:shadow-neutral cursor-pointer transition-colors"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
-              <p className="text-neutral text-sm !mt-6 text-center">Don't have an account? <Link to='/' className="text-primary hover:underline ml-1 whitespace-nowrap font-semibold">Back to Home</Link></p>
-            </form>
+            </div>
+
+            {/* یاد رکھیں اور پاس ورڈ بھول گئے */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2">
+              <label className="label cursor-pointer gap-3">
+                <input type="checkbox" className="checkbox checkbox-sm checkbox-neutral" />
+                <span className="label-text">Remember me</span>
+              </label>
+              <Link to="#" className="text-sm font-semibold text-primary hover:underline">
+                Forgot password?
+              </Link>
+            </div>
+            <div className="pt-4">
+              <button
+                type="submit"
+                disabled={loading}
+                className="btn btn-neutral w-full text-lg shadow-lg hover:shadow-neutral/20 transition-all normal-case"
+              >
+                {loading ? (
+                  <Loader className="w-5 h-5 animate-spin" />
+                ) : "Sign In"}
+              </button>
+            </div>
+          </form>
+          <div className="mt-8 text-center">
+            <p className="text-sm text-base-content/60">
+              Not a librarian?
+              <Link to="/" className="text-primary font-bold ml-1 hover:underline">Back to Home</Link>
+            </p>
           </div>
         </div>
       </div>

@@ -44,20 +44,34 @@
   --noise: 0;
 }
 
-* {
+html,
+body {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
+  /* اسکرول بار کو مکمل ختم کرنے کے لیے */
+  overflow: hidden;
+  height: 100%;
 }
 
 #root {
   display: flex;
   flex-direction: column;
-  min-height: 100dvh;
-}
-main {
-  flex: 1 0 auto;
+  height: 100dvh; /* min-height کے بجائے فکسڈ height دیں */
 }
 
-/* goggle fonts */
+/* اگر مواد زیادہ ہو تو صرف main کے اندر اسکرول آئے */
+main {
+  flex: 1;
+  overflow-y: auto;
+  -ms-overflow-style: none; /* IE/Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+main::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+  /* goggle fonts */
+}
 .zain-light {
   font-family: "Zain", sans-serif;
   font-weight: 300;
@@ -87,4 +101,3 @@ main {
   font-weight: 400;
   font-style: normal;
 }
-
