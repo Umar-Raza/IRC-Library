@@ -19,7 +19,7 @@ export const Navbar = () => {
     };
 
     return (
-        <header className="navbar shadow-sm px-7.5 w-full flex items-center  justify-between sticky top-0 z-50 bg-base-100">
+        <header className="navbar shadow-sm px-10 w-full flex items-center  justify-between sticky top-0 z-50 bg-base-100">
             <div className="navbar-start">
                 <div className="dropdown">
                     <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -29,24 +29,24 @@ export const Navbar = () => {
                         tabIndex="-1"
                         className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
                         <li><Link to="/" className='btn btn-sm btn-neutral btn-ghost'>Home</Link></li>
-                        <li><a>Item 3</a></li>
+                        <li><Link to="/" className='btn btn-sm btn-neutral btn-ghost'>Social Media </Link></li>
                     </ul>
                 </div>
                 <Link to="/" className="btn btn-link text-2xl"><Library />IRC Library</Link>
             </div>
             <div className="navbar-center">
-                <ul className="menu menu-horizontal px-1">
+                <ul className="menu menu-horizontal">
                     <li><Link to="/" className='btn btn-sm btn-neutral btn-ghost text-xl'>Home</Link></li>
+                    <li><Link to="/" className='btn btn-sm btn-neutral btn-ghost text-xl'>Social Media</Link></li>
                 </ul>
             </div>
 
-            <div className="flex items-end gap-4">
+            <div className="navbar-end flex items-end gap-4">
                 {user ? (
-                    /* اگر یوزر لاگ ان ہے تو یہ نظر آئے گا */
                     <div className="flex items-center gap-3">
-                        <div className="hidden md:flex flex-col items-end mr-2">
-                            <span className="text-sm font-bold text-neutral leading-none">Librarian</span>
-                            {/* <span className="text-xs text-base-content/60">{user.email}</span> */}
+                        <div className="hidden md:flex flex-col items-end">
+                            {/* <span className="text-sm font-bold text-neutral leading-none">Librarian</span> */}
+                            <span className="text-xs text-base-content/60">{user.email}</span>
                             <button className='btn-link cursor-pointer hover:text-neutral' onClick={() => navigate('/librarian-dashboard')}>Librarian Dashboard</button>
                         </div>
 

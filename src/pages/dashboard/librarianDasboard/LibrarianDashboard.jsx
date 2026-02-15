@@ -218,19 +218,19 @@ export const LibrarianDashboard = () => {
   };
 
   return (
-    <div className="card card-side bg-base-100  shadow-xl m-4 w-[80%] mx-auto min-h-100vh">
-      <div className="card-body zain-light">
-        <div className="btn-and-heading flex justify-between items-center">
-          <h2 className="card-title text-2xl font-bold mt-3 mb-5 font-sans">Librarian Dashboard</h2>
-          <div className="flex gap-2 mb-5 font-sans">
+    <div className="card bg-base-100 shadow-xl my-4 w-[98%] lg:w-[94%] xl:w-[92%] mx-auto border border-base-200">
+      <div className="card-body p-3 sm:p-6 md:p-8 zain-light">
+        <div className="flex flex-col lg:flex-row justify-between items-center gap-4 mb-8">
+          <h2 className="card-title text-2xl font-bold font-sans">Librarian Dashboard</h2>
+          <div className="flex flex-wrap sm:flex-nowrap justify-center gap-2 w-full lg:w-auto ">
             <button
-              className="btn btn-neutral"
+              className="btn btn-neutral btn-sm md:btn-md flex-1 lg:flex-none"
               onClick={() => document.getElementById('issued_books_modal').showModal()}
             >
-              Issued Books List
+              Issued Books
             </button>
-            <button className="btn btn-neutral" onClick={() => document.getElementById('reader_modal').showModal()}>Manage Readers</button>
-            <button className="btn btn-neutral " onClick={() => { setEditingBookId(null); setState(initialState); document.getElementById('my_modal_4').showModal() }}>Add New Book<SquarePlus /></button>
+            <button className="btn btn-neutral btn-sm md:btn-md flex-1 lg:flex-none" onClick={() => document.getElementById('reader_modal').showModal()}>Manage Readers</button>
+            <button className="btn btn-neutral btn-sm md:btn-md flex-1 lg:flex-none" onClick={() => { setEditingBookId(null); setState(initialState); document.getElementById('my_modal_4').showModal() }}>Add Book<SquarePlus /></button>
           </div>
           <dialog id="my_modal_4" className="modal" dir='rtl'>
             <div className="modal-box w-11/12 max-w-5xl">
@@ -264,14 +264,14 @@ export const LibrarianDashboard = () => {
             </div>
           </dialog>
         </div>
-        <div className="bg-base-100 rounded-xl shadow p-4 mb-4" dir="rtl">
-          <div className="flex flex-col md:flex-row items-stretch gap-3">
-            <div className="flex-2 min-w-0">
+        <div className=" rounded-xl p-4 mb-6 border border-base-300" dir="rtl">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
+            <div className="md:col-span-6">
               <SearchBooks onSearch={(value) => setSearchTerm(value)} />
             </div>
-            <span className='w-full md:w-1/4'>
+            <span className='md:col-span-3'>
               <select
-                className="select select-bordered "
+                className="select select-bordered w-full"
                 value={subjectFilter}
                 onChange={(e) => setSubjectFilter(e.target.value)}
               >
@@ -281,9 +281,9 @@ export const LibrarianDashboard = () => {
                 ))}
               </select>
             </span>
-            <span className='w-full md:w-1/4'>
+            <span className='md:col-span-3'>
               <select
-                className="select select-bordered w-full md:w-1/4"
+                className="select select-bordered w-full"
                 value={sortOrder}
                 onChange={(e) => setSortOrder(e.target.value)}
               >
@@ -295,15 +295,17 @@ export const LibrarianDashboard = () => {
             </span>
           </div>
         </div>
-        <BooksTable
-          loading={books.length === 0 && !searchTerm}
-          books={filteredBooks}
-          readers={readers}
-          updateStatus={updateStatus}
-          handleEditBook={handleEditBook}
-          searchTerm={searchTerm}
-          isAdmin={true}
-        />
+        <div className="relative overflow-x-auto">
+          <BooksTable
+            loading={books.length === 0 && !searchTerm}
+            books={filteredBooks}
+            readers={readers}
+            updateStatus={updateStatus}
+            handleEditBook={handleEditBook}
+            searchTerm={searchTerm}
+            isAdmin={true}
+          />
+        </div>
         {!loading && books.length > 0 && filteredBooks.length === 0 && (
           <div className="py-20 text-center">
             <SearchX size={64} className="mx-auto mb-4 text-base-content/20" />
@@ -332,6 +334,7 @@ export const LibrarianDashboard = () => {
               onChange={(e) => setNewReaderName(e.target.value)}
             />
           </div>
+
           <div className="mt-4 max-h-40 overflow-y-auto border rounded-lg p-2">
             <p className="text-xs font-bold mb-2 text-gray-500">Existing Readers (Click trash to delete):</p>
             {readers.length === 0 ? (

@@ -3,3 +3,12 @@
     box-sizing: border-box;
     font-size: 18px;
 }
+
+/* سکرول بار کو موبائل پر نظر آنے کے لیے تھوڑا واضح کریں */
+.overflow-x-auto::-webkit-scrollbar {
+  height: 6px;
+}
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background-color: oklch(var(--n));
+  border-radius: 10px;
+}

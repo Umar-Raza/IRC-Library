@@ -87,14 +87,14 @@ export const Home = () => {
     );
 
     return (
-        <div className="card card-side bg-base-100 zain-light shadow-xl m-4 w-[80%] mx-auto">
+        <div className="card bg-base-100 zain-light shadow-xl m-4 w-[95%] md:w-[80%] mx-auto">
             <div className="card-body">
                 <div className="text-center mb-1">
-                    <span className="text-lg text-neutral">اسلامک ریسرچ سینٹر فیصل آباد میں کل : <span className="font-bold"> {books.length}</span> مجلدات موجود ہیں۔</span>
+                    <span className="text-sm sm:text-lg text-neutral">اسلامک ریسرچ سینٹر فیصل آباد میں کل  <span className="font-bold bg-neutral text-white px-2 py-0.5 rounded-lg ml-1"> {books.length}</span> مجلدات موجود ہیں۔</span>
                 </div>
                 <div className="bg-base-100 rounded-xl shadow  border border-base-300 p-4 mb-2" dir="rtl">
-                    <div className="flex flex-col md:flex-row items-stretch gap-3">
-                        <div className="flex-2 min-w-0">
+                    <div className="flex flex-col lg:flex-row items-stretch gap-3">
+                        <div className="flex-1 lg:flex-2 min-w-0">
                             <SearchBooks onSearch={(value) => setSearchTerm(value)} />
                         </div>
 
@@ -153,6 +153,7 @@ export const Home = () => {
                                 </div>
                             )}
                         </div>
+                        
                         <div className="relative w-full md:w-1/4 text-[16px]" ref={sortRef} dir="rtl">
                             <div
                                 className="input input-bordered flex items-center justify-between cursor-pointer bg-base-100 pr-4 pl-3"

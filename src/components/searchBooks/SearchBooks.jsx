@@ -50,7 +50,7 @@ export const SearchBooks = ({ onSearch }) => {
         onBlur={(e) => (e.target.placeholder = "کتاب یا مصنف سرچ کریں۔۔۔")}
         onChange={(e) => onSearch && onSearch(e.target.value)}
       />
-      <kbd className="kbd kbd-sm p-3">Ctrl + K</kbd>
+      <kbd className="kbd kbd-sm p-3">/</kbd>
     </label>
   );
 };

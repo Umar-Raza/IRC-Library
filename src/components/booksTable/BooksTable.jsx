@@ -26,8 +26,8 @@ export const BooksTable = ({ books, readers, updateStatus, handleEditBook, loadi
 
   return (
     <>
-      <div className="overflow-x-auto max-h-[70vh]" dir="rtl">
-        <table className="table w-full zain-light">
+      <div className="relative overflow-x-auto max-h-[70vh]" dir="rtl">
+        <table className="table w-full min-w-200 zain-light">
           <thead className="bg-neutral sticky top-0 z-10 text-neutral-content">
             <tr>
               <th className="w-10">#</th>
@@ -89,9 +89,9 @@ export const BooksTable = ({ books, readers, updateStatus, handleEditBook, loadi
                       <p><span className="font-semibold text-[16px]">مکتبہ:</span> <span className="text-[15px] mr-1">{book.publisher}</span></p>
                     </div>
                   </td>
-                  <td className="py-4 text-center">
+                  <td className="py-4 text-center whitespace-nowrap">
                     <button
-                      className="btn btn-outline btn-accent flex items-center justify-center gap-2 font-sans"
+                      className="btn btn-outline btn-accent btn-sm sm:btn-md font-sans"
                       onClick={() => {
                         if (book.bookLink) {
                           window.open(book.bookLink, '_blank');
@@ -103,9 +103,9 @@ export const BooksTable = ({ books, readers, updateStatus, handleEditBook, loadi
                       Download <Download size={20} />
                     </button>
                   </td>
-                  <td className="py-4 text-center">
+                  <td className="py-4 text-center whitespace-nowrap">
                     <select
-                      className={`select select-sm w-36 ${book.status === 'library' ? 'select-success' : 'select-error'}`}
+                      className={`select select-sm w-full min-w-30 ${book.status === 'library' ? 'select-success' : 'select-error'}`}
                       value={book.status}
                       onChange={(e) => updateStatus(book.id, e.target.value)}
                     >
@@ -116,7 +116,6 @@ export const BooksTable = ({ books, readers, updateStatus, handleEditBook, loadi
                     </select>
                   </td>
                   {isAdmin && (
-
                     <td className="pt-6 text-center">
                       <div className="dropdown dropdown-left">
                         <button className="btn btn-ghost btn-sm"><EllipsisVertical /></button>
