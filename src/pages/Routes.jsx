@@ -9,6 +9,7 @@ import { Toaster } from 'react-hot-toast'
 import { ProtectedRouteForLibrarian } from './dashboard/auth/ProtectedRouteForLibrarian.jsx'
 import { PublicRouteForLibrarian } from './dashboard/auth/PublicRouteForLibrarian.jsx'
 import { AuthProvider } from '@/context/AuthContext.jsx'
+import { NoPage } from './noPage/Nopage.jsx'
 const index = () => {
     return (
         <AuthProvider>
@@ -24,6 +25,7 @@ const index = () => {
                         <ProtectedRouteForLibrarian>
                             <LibrarianDashboard />
                         </ProtectedRouteForLibrarian>} />
+                    <Route path='*' element={<NoPage />} />
                 </Routes>
             </main>
             <Toaster />
