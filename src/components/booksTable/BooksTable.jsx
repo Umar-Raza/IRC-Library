@@ -109,12 +109,14 @@ export const BooksTable = ({ books, readers, updateStatus, handleEditBook, loadi
                       value={book.status}
                       onChange={(e) => updateStatus(book.id, e.target.value)}
                     >
-                      <option value="library">لائبریری</option>
-                      {readers.map((reader) => (
+                      {!isAdmin && <option value="library">اسٹیٹس</option>}
+                      {isAdmin && <option value="library">لائبریری</option>}
+                      {readers.filter(reader => isAdmin || reader.name !== "library").map((reader) => (
                         <option key={reader.id} value={reader.name}>{reader.name}</option>
                       ))}
                     </select>
                   </td>
+                  
                   {isAdmin && (
                     <td className="pt-6 text-center">
                       <div className="dropdown dropdown-left">

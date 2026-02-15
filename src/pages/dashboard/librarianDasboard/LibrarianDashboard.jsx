@@ -230,7 +230,7 @@ export const LibrarianDashboard = () => {
               Issued Books
             </button>
             <button className="btn btn-neutral btn-sm md:btn-md flex-1 lg:flex-none" onClick={() => document.getElementById('reader_modal').showModal()}>Manage Readers</button>
-            <button className="btn btn-neutral btn-sm md:btn-md flex-1 lg:flex-none" onClick={() => { setEditingBookId(null); setState(initialState); document.getElementById('my_modal_4').showModal() }}>Add Book<SquarePlus /></button>
+            <button className="btn btn-neutral btn-sm md:btn-md flex-1 lg:flex-none" onClick={() => { setEditingBookId(null); setState(initialState); document.getElementById('my_modal_4').showModal() }}>Add Book</button>
           </div>
           <dialog id="my_modal_4" className="modal" dir='rtl'>
             <div className="modal-box w-11/12 max-w-5xl">

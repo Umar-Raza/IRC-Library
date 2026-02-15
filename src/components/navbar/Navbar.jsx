@@ -1,6 +1,7 @@
 import { useAuth } from '@/context/AuthContext';
-import { Library, LogIn, LogOut } from 'lucide-react'
+import {  LogIn, LogOut, SquareLibrary } from 'lucide-react'
 import React from 'react'
+import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom'
 
 export const Navbar = () => {
@@ -12,33 +13,36 @@ export const Navbar = () => {
         try {
             await logout();
             toast.success("Logout successful");
-            navigate('/librarian-login');
+            navigate('/');
         } catch (error) {
             toast.error("Logout failed");
         }
     };
 
     return (
-        <header className="navbar shadow-sm px-10 w-full flex items-center  justify-between sticky top-0 z-50 bg-base-100">
+        <header className="navbar shadow-sm px-3 sm:px-21 w-full flex items-center justify-between sticky top-0 z-50 bg-base-100">
             <div className="navbar-start">
                 <div className="dropdown">
-                    <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" /> </svg>
+                    <div tabIndex={0} role="button" className="btn btn-ghost">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" /> </svg>
                     </div>
                     <ul
                         tabIndex="-1"
                         className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-                        <li><Link to="/" className='btn btn-sm btn-neutral btn-ghost'>Home</Link></li>
-                        <li><Link to="/" className='btn btn-sm btn-neutral btn-ghost'>Social Media </Link></li>
+                        <li><Link to="/" className='btn btn-md btn-neutral btn-ghost'>Home</Link></li>
+                        <li><Link to="/" className='btn btn-md btn-neutral btn-ghost'>Social Media </Link></li>
                     </ul>
                 </div>
-                <Link to="/" className="btn btn-link text-2xl"><Library />IRC Library</Link>
             </div>
-            <div className="navbar-center">
-                <ul className="menu menu-horizontal">
-                    <li><Link to="/" className='btn btn-sm btn-neutral btn-ghost text-xl'>Home</Link></li>
-                    <li><Link to="/" className='btn btn-sm btn-neutral btn-ghost text-xl'>Social Media</Link></li>
-                </ul>
+
+            <div className='navbar-center flex items-center justify-center gap-3 group font-sans'>
+                <SquareLibrary className="text-neutral w-6 h-6 sm:w-9 sm:h-9" />
+                <Link to="/">
+                    <span className="text-lg sm:text-2xl font-bold text-neutral group-hover:text-[#457b9d] transition-colors">
+                        <span className="hidden sm:inline">Islamic Research Center Library</span>
+                        <span className="sm:hidden text-sm">IRC Library</span>
+                    </span>
+                </Link>
             </div>
 
             <div className="navbar-end flex items-end gap-4">
@@ -63,7 +67,7 @@ export const Navbar = () => {
                         to="/librarian-login"
                         className="btn btn-neutral btn-dash btn-outline btn-sm sm:btn-md gap-2  transition-all"
                     >
-                        Login
+                        <span className="hidden sm:inline">Login</span>
                         <LogIn size={18} />
                     </Link>
                 )}

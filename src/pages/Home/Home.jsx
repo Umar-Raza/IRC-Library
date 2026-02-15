@@ -87,7 +87,7 @@ export const Home = () => {
     );
 
     return (
-        <div className="card bg-base-100 zain-light shadow-xl m-4 w-[95%] md:w-[80%] mx-auto">
+        <div className="card bg-base-100 shadow-xl my-4 w-[98%] lg:w-[94%] xl:w-[92%] mx-auto border border-base-200">
             <div className="card-body">
                 <div className="text-center mb-1">
                     <span className="text-sm sm:text-lg text-neutral">اسلامک ریسرچ سینٹر فیصل آباد میں کل  <span className="font-bold bg-neutral text-white px-2 py-0.5 rounded-lg ml-1"> {books.length}</span> مجلدات موجود ہیں۔</span>
