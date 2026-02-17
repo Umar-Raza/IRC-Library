@@ -107,11 +107,11 @@ export const BooksTable = ({ books, readers, handleEditBook, loading, isAdmin = 
                     </button>
                   </td>
                   <td className="py-4 text-center whitespace-nowrap relative">
-                    <div className="relative flex items-center justify-center">
+                    <div className="flex items-center gap-2">
                       <select
-                        className={`select select-sm w-full min-w-30 ${book.status === 'library' ? 'select-success' : 'select-error'} ${updatingBookId === book.id ? 'opacity-50' : ''}`}
+                        className={`select select-sm w-full min-w-30 ${book.status === 'library' ? 'select-success' : 'select-error'}`}
                         value={book.status}
-                        disabled={updatingBookId === book.id}
+                        disabled={updatingBookId === book.id} // لوڈنگ کے دوران ڈس ایبل کر دیں
                         onChange={(e) => updateStatus(book.id, e.target.value)}
                       >
                         {!isAdmin && <option value="library">اسٹیٹس</option>}
@@ -121,12 +121,11 @@ export const BooksTable = ({ books, readers, handleEditBook, loading, isAdmin = 
                         ))}
                       </select>
                       {updatingBookId === book.id && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-base-100/20 rounded-lg">
-                          <Loader className="animate-spin text-neutral" size={18} />
-                        </div>
+                        <Loader className="ml-2" size={16} />
                       )}
                     </div>
                   </td>
+
                   {isAdmin && (
                     <td className="pt-6 text-center">
                       <div className="dropdown dropdown-left">

@@ -34,8 +34,7 @@ export const LibrarianDashboard = () => {
   const [sortOrder, setSortOrder] = useState('newest')
 
   // BooksContext
-  const { books, setBooks, loading, loadingMore, hasMore, fetchMore, updateStatus, updatingBookId } = useBooks();
-
+  const { books, setBooks, loading, loadingMore, hasMore, fetchMore, updateStatus, updatingBookId, searchBooksInFirestore } = useBooks();
 
 
   const handleChange = (e) => {
@@ -50,6 +49,35 @@ export const LibrarianDashboard = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsProcessing(true)
+
+
+    // Generate search keywords for the book (for future search optimization)
+    const generateKeywords = (name) => {
+      if (!name) return [];
+      const lowerName = name.toLowerCase().trim();
+      const keywords = new Set();
+
+      // 1. پورے نام کے ٹکڑے بنانا (بشمول اسپیس)
+      // مثال: "بانگ درا" -> "ب", "با", "بان", "بانگ ", "بانگ د"...
+      let fullTerm = "";
+      for (const char of lowerName) {
+        fullTerm += char;
+        keywords.add(fullTerm);
+      }
+
+      // 2. ہر لفظ کے الگ سے بھی ٹکڑے بنانا (تاکہ دوسرے لفظ سے بھی سرچ ہو سکے)
+      const words = lowerName.split(/\s+/); // ایک سے زیادہ اسپیس کو بھی ہینڈل کرے گا
+      words.forEach(word => {
+        let curr = "";
+        for (const char of word) {
+          curr += char;
+          keywords.add(curr);
+        }
+      });
+
+      return Array.from(keywords);
+    };
+
 
     const { titlePage, createdAt, ...restOfData } = state;
     let imageUrl = state.titlePage;
@@ -105,6 +133,7 @@ export const LibrarianDashboard = () => {
         const newBookData = {
           ...restOfData,
           titlePage: imageUrl,
+          searchKeywords: generateKeywords(state.bookName),
           createdAt: now,
         };
         const docRef = await addDoc(collection(firestore, 'books'), newBookData);
@@ -133,6 +162,8 @@ export const LibrarianDashboard = () => {
       setIsProcessing(false)
       setEditingBookId(null)
     }
+
+
   }
 
   //  Loading readers from database with real-time updates
@@ -191,25 +222,25 @@ export const LibrarianDashboard = () => {
   };
 
   // Filter books based on search term
-  const filteredBooks = books
-    .filter((book) => {
-      const searchLower = searchTerm.toLowerCase();
-      const matchesSearch =
-        book.bookName?.toLowerCase().includes(searchLower) ||
-        book.author?.toLowerCase().includes(searchLower);
-      const matchesSubject = subjectFilter === "" || subjectFilter === "کتابوں کی قسمیں" || book.subject === subjectFilter;
-      return matchesSearch && matchesSubject;
-    })
-    .sort((a, b) => {
-      const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(0);
-      const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(0);
+  // const filteredBooks = books
+  //   .filter((book) => {
+  //     const searchLower = searchTerm.toLowerCase();
+  //     const matchesSearch =
+  //       book.bookName?.toLowerCase().includes(searchLower) ||
+  //       book.author?.toLowerCase().includes(searchLower);
+  //     const matchesSubject = subjectFilter === "" || subjectFilter === "کتابوں کی قسمیں" || book.subject === subjectFilter;
+  //     return matchesSearch && matchesSubject;
+  //   })
+  //   .sort((a, b) => {
+  //     const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(0);
+  //     const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(0);
 
-      if (sortOrder === 'نئی کتابیں') return dateB.getTime() - dateA.getTime();
-      if (sortOrder === 'پرانی کتابیں') return dateA.getTime() - dateB.getTime();
-      if (sortOrder === 'ا → ے') return (a.bookName || "").localeCompare((b.bookName || ""), 'ur');
-      if (sortOrder === 'ے → ا') return (b.bookName || "").localeCompare((a.bookName || ""), 'ur');
-      return 0;
-    });
+  //     if (sortOrder === 'نئی کتابیں') return dateB.getTime() - dateA.getTime();
+  //     if (sortOrder === 'پرانی کتابیں') return dateA.getTime() - dateB.getTime();
+  //     if (sortOrder === 'ا → ے') return (a.bookName || "").localeCompare((b.bookName || ""), 'ur');
+  //     if (sortOrder === 'ے → ا') return (b.bookName || "").localeCompare((a.bookName || ""), 'ur');
+  //     return 0;
+  //   });
 
 
   return (
@@ -263,18 +294,21 @@ export const LibrarianDashboard = () => {
         <div className=" rounded-xl p-4 mb-6 border border-base-300" dir="rtl">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
             <div className="md:col-span-6">
-              <SearchBooks onSearch={(value) => setSearchTerm(value)} />
+              <SearchBooks onSearch={searchBooksInFirestore} />
             </div>
             <span className='md:col-span-3'>
               <select
                 className="select select-bordered w-full"
                 value={subjectFilter}
-                onChange={(e) => setSubjectFilter(e.target.value)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setSubjectFilter(val);
+                }}
               >
                 <option value="">تمام مضامین</option>
-                {[...new Set(books.map(book => book.subject))].filter(Boolean).map((subject) => (
+                {/* {[...new Set(books.map(book => book.subject))].filter(Boolean).map((subject) => (
                   <option key={subject} value={subject}>{subject}</option>
-                ))}
+                ))} */}
               </select>
             </span>
             <span className='md:col-span-3'>
@@ -295,7 +329,7 @@ export const LibrarianDashboard = () => {
         <div className="relative overflow-x-auto">
           <BooksTable
             loading={books.length === 0 && !searchTerm}
-            books={filteredBooks}
+            books={books || []}
             readers={readers}
             updateStatus={updateStatus}
             handleEditBook={handleEditBook}
@@ -315,13 +349,10 @@ export const LibrarianDashboard = () => {
             )}
           </div>
         </div>
-        {!loading && books.length > 0 && filteredBooks.length === 0 && (
+        {!loading && books.length === 0 && searchTerm && (
           <div className="py-20 text-center">
             <SearchX size={64} className="mx-auto mb-4 text-base-content/20" />
-            <h3 className="text-3xl font-bold text-base-content/50">  معذرت! الفاظ "{searchTerm}" کے مطابق کتاب یا مصف نہیں ہے۔</h3>
-            <h3 className="text-2xl mt-2 font-bold text-base-content/40">
-              براہ کرم الفاظ بدل کر سرچ کریں۔
-            </h3>
+            <h3 className="text-3xl font-bold text-base-content/50">معذرت! "{searchTerm}" کے رزلٹ نہیں ملے۔</h3>
           </div>
         )}
       </div >

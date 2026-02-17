@@ -1,31 +1,27 @@
-import React, { useEffect, useRef } from 'react';
+import { useBooks } from '@/context/BooksContext';
+import React, { useRef, useState } from 'react';
 
-export const SearchBooks = ({ onSearch }) => {
-  const inputRef = useRef(null);
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-        if (e.key === 'Escape') {
-          inputRef.current?.blur();
-        }
-        return;
-      }
+export const SearchBooks = () => {
 
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault();
-        inputRef.current?.focus();
-      }
+  const { searchBooksInFirestore } = useBooks();
 
-      if (e.key === '/') {
-        e.preventDefault();
-        inputRef.current?.focus();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []);
+  // یہ لائن شامل کریں تاکہ ایرر ختم ہو جائے
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const timeoutRef = useRef(null);
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+
+    // اب یہ لائن ایرر نہیں دے گی
+    setSearchTerm(value);
+
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+    timeoutRef.current = setTimeout(() => {
+      searchBooksInFirestore(value);
+    }, 500);
+  };
   return (
 
     <label className="input flex items-center w-full md:w-2/4">
@@ -42,13 +38,14 @@ export const SearchBooks = ({ onSearch }) => {
         </g>
       </svg>
       <input
-        ref={inputRef}
+        // ref={inputRef}
         type="search"
         className="grow"
         placeholder="کتاب یا مصنف سرچ کریں۔۔۔"
         onFocus={(e) => (e.target.placeholder = "اردو کی بورڈ منتخب کریں۔۔۔")}
         onBlur={(e) => (e.target.placeholder = "کتاب یا مصنف سرچ کریں۔۔۔")}
-        onChange={(e) => onSearch && onSearch(e.target.value)}
+        onChange={handleInputChange}
+        value={searchTerm} // ان پٹ کو اسٹیٹ کے ساتھ جوڑیں
       />
       <kbd className="kbd kbd-sm p-3">/</kbd>
     </label>
