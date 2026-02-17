@@ -30,7 +30,7 @@ export const LibrarianLogin = () => {
     e.preventDefault();
     setLoading(true);
     try {
-       await signInWithEmailAndPassword(auth, formData.email, formData.password);
+      await signInWithEmailAndPassword(auth, formData.email, formData.password);
       toast.success("Login successful!");
       navigate('/librarian-dashboard');
     } catch (error) {
@@ -54,7 +54,6 @@ export const LibrarianLogin = () => {
                 <div className="bg-neutral p-1 rounded-xl shadow-lg group-hover:bg-[#457b9d] transition-all duration-300">
                   <SquareLibrary className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
                 </div>
-
                 <span className='text-2xl sm:text-3xl font-bold text-neutral group-hover:text-[#457b9d] transition-colors'>
                   IRC Library
                 </span>

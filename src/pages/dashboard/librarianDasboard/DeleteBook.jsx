@@ -3,16 +3,22 @@ import { deleteDoc, doc } from 'firebase/firestore'
 import React from 'react'
 import toast from 'react-hot-toast'
 import { Trash } from 'lucide-react'
+import { useBooks } from '@/context/BooksContext'
 
 export const DeleteBook = ({ bookId }) => {
+    const { setBooks } = useBooks(); 
+
     const handleDelete = async () => {
-        if (window.confirm("Are you sure you want to delete this book?")) {
+        if (window.confirm("کیا آپ واقعی یہ کتاب ڈیلیٹ کرنا چاہتے ہیں؟")) {
             try {
                 await deleteDoc(doc(firestore, 'books', bookId));
-                toast.success("Book deleted successfully");
+
+                setBooks(prevBooks => prevBooks.filter(book => book.id !== bookId));
+
+                toast.success("کتاب کامیابی سے ڈیلیٹ کر دی گئی ہے");
             } catch (err) {
                 console.error("Error deleting book:", err);
-                toast.error("Failed to delete book");
+                toast.error("کتاب ڈیلیٹ کرنے میں ناکامی ہوئی");
             }
         }
     };

@@ -1,14 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { collection, query, orderBy, onSnapshot, doc, updateDoc } from 'firebase/firestore'
-import { SearchIcon, SearchX } from 'lucide-react'
+import { collection, query, orderBy, onSnapshot } from 'firebase/firestore'
+import { Loader,  SearchIcon, SearchX } from 'lucide-react'
 import { firestore } from '@/config/Firebase';
-import { toast } from 'react-hot-toast';
 import { BooksTable } from '@/components/booksTable/BooksTable';
 import { SearchBooks } from '@/components/searchBooks/SearchBooks';
-import { ChevronDown, Search } from 'lucide-react';
+import { ChevronDown,  } from 'lucide-react';
+import { useBooks } from '@/context/BooksContext';
 export const Home = () => {
-    const [books, setBooks] = useState([]);
-    const [loading, setLoading] = useState(true);
+    
     const [searchTerm, setSearchTerm] = useState('');
     const [subjectFilter, setSubjectFilter] = useState('');
     const [sortOrder, setSortOrder] = useState('نئی کتابیں');
@@ -16,9 +15,12 @@ export const Home = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [subjectSearch, setSubjectSearch] = useState("");
     const dropdownRef = useRef(null);
-    const [isSortOpen, setIsSortOpen] = useState(false); // سورٹنگ مینو کھولنے کے لیے
-    const sortRef = useRef(null); // سورٹنگ مینو کے باہر کلک کو پکڑنے کے لیے
-    const sortOptions = ["نئی کتابیں", "پرانی کتابیں", "ا → ے", "ے → ا"]; // آپشنز کی لسٹ
+    const [isSortOpen, setIsSortOpen] = useState(false);
+    const sortRef = useRef(null);
+    const sortOptions = ["نئی کتابیں", "پرانی کتابیں", "ا → ے", "ے → ا"];
+    
+    //  Books Context
+    const { books, loading, loadingMore, hasMore, fetchMore, updateStatus } = useBooks();
 
     useEffect(() => {
         const q = query(collection(firestore, 'readers'), orderBy('name', 'asc'));
@@ -29,25 +31,8 @@ export const Home = () => {
         return () => unsubscribe();
     }, []);
 
-    useEffect(() => {
-        const q = query(collection(firestore, 'books'), orderBy('createdAt', 'desc'));
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setBooks(list);
-            setLoading(false);
-        });
-        return () => unsubscribe();
-    }, []);
 
-    const updateStatus = async (bookId, newStatus) => {
-        try {
-            const bookRef = doc(firestore, 'books', bookId);
-            await updateDoc(bookRef, { status: newStatus });
-            toast.success(`Status Updated!: ${newStatus}`);
-        } catch (err) {
-            toast.error("Status update failed!");
-        }
-    };
+
     const filteredBooks = books
         .filter((book) => {
             const searchLower = searchTerm.toLowerCase();
@@ -81,16 +66,25 @@ export const Home = () => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+
     const allSubjects = [...new Set(books.map(book => book.subject))].filter(Boolean);
     const filteredSubjects = allSubjects.filter(s =>
         s.toLowerCase().includes(subjectSearch.toLowerCase())
     );
 
     return (
-        <div className="card bg-base-100 shadow-xl my-4 w-[98%] lg:w-[94%] xl:w-[92%] mx-auto border border-base-200">
+        <div className="card bg-base-100 shadow-xl my-4 w-[98%] lg:w-[94%] xl:w-[92%] mx-auto border border-base-200 font-zain-light">
             <div className="card-body">
-                <div className="text-center mb-1">
-                    <span className="text-sm sm:text-lg text-neutral">اسلامک ریسرچ سینٹر فیصل آباد میں کل  <span className="font-bold bg-neutral text-white px-2 py-0.5 rounded-lg ml-1"> {books.length}</span> مجلدات موجود ہیں۔</span>
+                <div className="flex flex-row items-center justify-center gap-2 py-4 text-sm sm:text-lg text-neutral" dir="rtl">
+                    <span>اسلامک ریسرچ سینٹر فیصل آباد میں کل</span>
+                    <span className="font-bold bg-neutral text-white px-2 py-0.5 rounded-lg shrink-0">
+                        {loading ? (
+                            <Loader className="w-5 h-5  animate-spin mx-1" />
+                        ) : (
+
+                            <span> {books.length}</span>
+                        )}
+                    </span>مجلدات موجود ہیں۔
                 </div>
                 <div className="bg-base-100 rounded-xl shadow  border border-base-300 p-4 mb-2" dir="rtl">
                     <div className="flex flex-col lg:flex-row items-stretch gap-3">
@@ -153,7 +147,7 @@ export const Home = () => {
                                 </div>
                             )}
                         </div>
-                        
+
                         <div className="relative w-full md:w-1/4 text-[16px]" ref={sortRef} dir="rtl">
                             <div
                                 className="input input-bordered flex items-center justify-between cursor-pointer bg-base-100 pr-4 pl-3"
@@ -205,8 +199,23 @@ export const Home = () => {
                             updateStatus={updateStatus}
                             searchTerm={searchTerm}
                         />
+
                     )}
                 </div>
+
+                <div className="flex justify-center my-8">
+                    {hasMore && (
+                        <button onClick={fetchMore} className="btn btn-neutral px-10" disabled={loading || loadingMore}>
+                            {loadingMore ? (
+                                <>
+                                    <Loader className="w-5 h-5 animate-spin mx-2" />
+                                    <span>لوڈ ہو رہا ہے</span>
+                                </>
+                            ) : 'مزید کتابیں دیھکیں'}
+                        </button>
+                    )}
+                </div>
+
             </div>
         </div>
     )

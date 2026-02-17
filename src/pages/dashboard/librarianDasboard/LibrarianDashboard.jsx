@@ -1,7 +1,7 @@
 import { firestore } from '@/config/Firebase'
 import imageCompression from 'browser-image-compression'
 import { addDoc, collection, doc, onSnapshot, orderBy, query, updateDoc } from 'firebase/firestore'
-import { SquarePlus } from 'lucide-react'
+import { Loader } from 'lucide-react'
 import { SearchX } from 'lucide-react'
 import React from 'react'
 import { useEffect } from 'react'
@@ -10,6 +10,7 @@ import toast from 'react-hot-toast'
 import { DeleteReader } from './DeleteReader'
 import { SearchBooks } from '@/components/searchBooks/SearchBooks'
 import { BooksTable } from '@/components/booksTable/BooksTable'
+import { useBooks } from '@/context/BooksContext'
 const initialState = {
   bookName: '',
   author: '',
@@ -22,16 +23,18 @@ const initialState = {
 
 export const LibrarianDashboard = () => {
   const [state, setState] = useState(initialState)
-  const [loading, setLoading] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(false)
   const fileInputRef = useRef(null)
   const [readers, setReaders] = useState([])
-  const [books, setBooks] = useState([])
   const [newReaderName, setNewReaderName] = useState('')
   const [editingBookId, setEditingBookId] = useState(null)
   const [activeBookId, setActiveBookId] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [subjectFilter, setSubjectFilter] = useState('')
   const [sortOrder, setSortOrder] = useState('newest')
+
+  // BooksContext
+  const { books, setBooks, loading, loadingMore, hasMore, fetchMore, updateStatus, updatingBookId } = useBooks();
 
 
 
@@ -46,10 +49,9 @@ export const LibrarianDashboard = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setLoading(true)
+    setIsProcessing(true)
 
     const { titlePage, createdAt, ...restOfData } = state;
-    // 1. If title page is a file, compress and upload to Cloudinary, then get the URL
     let imageUrl = state.titlePage;
 
     if (titlePage && titlePage instanceof File) {
@@ -68,8 +70,8 @@ export const LibrarianDashboard = () => {
 
       const data = new FormData();
       data.append("file", compressedTitlePage, state.bookName || "book_image");
-      data.append("upload_preset", import.meta.env.VITE_APP_CLOUDINARY_uploadPreset); // Replace with your Cloudinary preset
-      data.append("cloud_name", import.meta.env.VITE_APP_CLOUDINARY_cloudName);    // Replace with your Cloudinary cloud name
+      data.append("upload_preset", import.meta.env.VITE_APP_CLOUDINARY_uploadPreset);
+      data.append("cloud_name", import.meta.env.VITE_APP_CLOUDINARY_cloudName);
 
       const res = await fetch(`https://api.cloudinary.com/v1_1/${import.meta.env.VITE_APP_CLOUDINARY_cloudName}/image/upload`, {
         method: "POST",
@@ -81,20 +83,41 @@ export const LibrarianDashboard = () => {
 
     try {
       if (editingBookId) {
-        // Update existing book
+        // 1. Update existing book in Firebase
         const bookRef = doc(firestore, 'books', editingBookId);
-        await updateDoc(bookRef, {
+        const updatedBookData = {
           ...restOfData,
           titlePage: imageUrl,
-        });
+        };
+        await updateDoc(bookRef, updatedBookData);
+
+        // 2. Update Context State
+        setBooks(prevBooks =>
+          prevBooks.map(book =>
+            book.id === editingBookId ? { ...book, ...updatedBookData } : book
+          )
+        );
+
         toast.success('!کتاب اپڈیٹ ہوگئی ہے');
       } else {
-        // Add new book
-        await addDoc(collection(firestore, 'books'), {
+        // 1. Add new book to Firebase
+        const now = new Date();
+        const newBookData = {
           ...restOfData,
           titlePage: imageUrl,
-          createdAt: new Date(),
-        });
+          createdAt: now,
+        };
+        const docRef = await addDoc(collection(firestore, 'books'), newBookData);
+
+        // 2. Update Context State
+        const newBookForState = {
+          id: docRef.id,
+          ...newBookData,
+          createdAt: { toDate: () => now }
+        };
+
+        setBooks(prevBooks => [newBookForState, ...prevBooks]);
+
         toast.success('!کتاب ایڈ ہوگئی ہے');
       }
 
@@ -107,12 +130,12 @@ export const LibrarianDashboard = () => {
       console.log(err)
       toast.error('Failed to add book')
     } finally {
-      setLoading(false)
+      setIsProcessing(false)
       setEditingBookId(null)
     }
   }
 
-  // 1. Loading readers from database with real-time updates
+  //  Loading readers from database with real-time updates
   useEffect(() => {
     const q = query(collection(firestore, 'readers'), orderBy('name', 'asc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -122,22 +145,13 @@ export const LibrarianDashboard = () => {
     return () => unsubscribe();
   }, []);
 
-  // 1. Loading books from database with real-time updates
-  useEffect(() => {
-    const q = query(collection(firestore, 'books'), orderBy('createdAt', 'desc'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setBooks(list);
-    });
-    return () => unsubscribe();
-  }, []);
 
-  // 2. Add new reader and update book status
+  // Add new reader and update book status
   const handleAddNewReaderSubmit = async () => {
     const trimmedName = newReaderName.trim();
     if (!trimmedName) return;
 
-    setLoading(true);
+    setIsProcessing(true);
     try {
       await addDoc(collection(firestore, 'readers'), {
         name: trimmedName,
@@ -152,20 +166,10 @@ export const LibrarianDashboard = () => {
     } catch (err) {
       toast.error("Something went wrong while adding new reader!");
     } finally {
-      setLoading(false);
+      setIsProcessing(false);
     }
   };
 
-  // 3. Status update Function
-  const updateStatus = async (bookId, newStatus) => {
-    try {
-      const bookRef = doc(firestore, 'books', bookId);
-      await updateDoc(bookRef, { status: newStatus });
-      toast.success(`Status Updated!: ${newStatus}`);
-    } catch (err) {
-      toast.error("Status update failed!");
-    }
-  };
 
   // Edit book function - populate the form with existing data and open modal
   const handleEditBook = (book) => {
@@ -207,15 +211,6 @@ export const LibrarianDashboard = () => {
       return 0;
     });
 
-  const handleReturnBook = async (bookId) => {
-    try {
-      const bookRef = doc(firestore, 'books', bookId);
-      await updateDoc(bookRef, { status: 'library' });
-      toast.success('کتاب لائبریری میں واپس جمع ہو گئی ہے');
-    } catch (err) {
-      toast.error('کتاب واپس کرنے میں مسئلہ پیش آیا ہے');
-    }
-  };
 
   return (
     <div className="card bg-base-100 shadow-xl my-4 w-[98%] lg:w-[94%] xl:w-[92%] mx-auto border border-base-200">
@@ -249,8 +244,8 @@ export const LibrarianDashboard = () => {
                 </select>
                 <input type="text" placeholder="مکبتہ" value={state.publisher} name='publisher' onChange={handleChange} id='publisher' className="input file-input-lg input-bordered w-full " />
                 <div className='mt-3 w-full flex justify-center md:col-span-2 font-sans'>
-                  <button dir='ltr' className="btn btn-neutral btn-wide" type='submit' disabled={loading}>
-                    {loading ? (
+                  <button dir='ltr' className="btn btn-neutral btn-wide" type='submit' disabled={isProcessing}>
+                    {isProcessing ? (
                       <>
                         <span className="loading loading-spinner loading-md "></span>
                         <span>Processing...</span>
@@ -264,6 +259,7 @@ export const LibrarianDashboard = () => {
             </div>
           </dialog>
         </div>
+
         <div className=" rounded-xl p-4 mb-6 border border-base-300" dir="rtl">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
             <div className="md:col-span-6">
@@ -295,6 +291,7 @@ export const LibrarianDashboard = () => {
             </span>
           </div>
         </div>
+
         <div className="relative overflow-x-auto">
           <BooksTable
             loading={books.length === 0 && !searchTerm}
@@ -305,6 +302,18 @@ export const LibrarianDashboard = () => {
             searchTerm={searchTerm}
             isAdmin={true}
           />
+          <div className="flex justify-center my-8">
+            {hasMore && (
+              <button onClick={fetchMore} className="btn btn-neutral px-10" disabled={loading || loadingMore}>
+                {loadingMore ? (
+                  <>
+                    <Loader className="w-5 h-5 animate-spin mx-2" />
+                    <span>لوڈ ہو رہا ہے</span>
+                  </>
+                ) : 'مزید کتابیں دیھکیں'}
+              </button>
+            )}
+          </div>
         </div>
         {!loading && books.length > 0 && filteredBooks.length === 0 && (
           <div className="py-20 text-center">
@@ -335,6 +344,7 @@ export const LibrarianDashboard = () => {
             />
           </div>
 
+          {/* Manage Readers modal box */}
           <div className="mt-4 max-h-40 overflow-y-auto border rounded-lg p-2">
             <p className="text-xs font-bold mb-2 text-gray-500">Existing Readers (Click trash to delete):</p>
             {readers.length === 0 ? (
@@ -354,8 +364,8 @@ export const LibrarianDashboard = () => {
             )}
           </div>
           <div className="modal-action flex justify-center gap-2">
-            <button className="btn btn-neutral btn-wide" onClick={handleAddNewReaderSubmit} disabled={loading}>
-              {loading ? (
+            <button className="btn btn-neutral btn-wide" onClick={handleAddNewReaderSubmit} disabled={isProcessing}>
+              {isProcessing ? (
                 <>
                   <span className="loading loading-spinner loading-md"></span>
                   <span>loading...</span>
@@ -367,14 +377,14 @@ export const LibrarianDashboard = () => {
           </div>
         </div>
       </dialog>
+
+      {/* Issued book readers modal */}
       <dialog id="issued_books_modal" className="modal font-sans w-full">
         <div className="modal-box w-11/12 max-w-3xl ">
           <form method="dialog">
             <button className="btn btn-sm btn-circle btn-error btn-ghost absolute right-2 top-2">✕</button>
           </form>
           <h3 className="font-bold text-2xl mb-6 text-center text-neutral">Issued Books by Reader</h3>
-
-          {/* Issued book readers list */}
           <div className="overflow-y-auto max-h-[70vh] mx-auto zain-light rounded-lg shadow " dir="rtl">
             <table className="table w-full" >
               <thead>
@@ -410,13 +420,18 @@ export const LibrarianDashboard = () => {
                       <td className="text-center align-top">
                         {issuedBooks.length > 0 ? (
                           <div className="flex flex-col gap-2 items-center">
-                            {issuedBooks.map(book => (
+                            {issuedBooks.map((book) => (
                               <button
                                 key={book.id}
-                                className="btn btn-xs btn-success btn-outline btn-dash font-sans h-6 min-h-0"
-                                onClick={() => handleReturnBook(book.id)}
+                                className="btn btn-xs btn-success btn-outline btn-dash font-sans h-6 min-h-0 flex items-center gap-1"
+                                onClick={() => updateStatus(book.id, 'library')}
+                                disabled={updatingBookId === book.id}
                               >
-                                Return
+                                {updatingBookId === book.id ? (
+                                  <Loader className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  "Return"
+                                )}
                               </button>
                             ))}
                           </div>
@@ -425,8 +440,7 @@ export const LibrarianDashboard = () => {
                             Return
                           </button>
                         )}
-                      </td>
-                    </tr>
+                      </td></tr>
                   );
                 })}
               </tbody>

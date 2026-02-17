@@ -10,26 +10,29 @@ import { ProtectedRouteForLibrarian } from './dashboard/auth/ProtectedRouteForLi
 import { PublicRouteForLibrarian } from './dashboard/auth/PublicRouteForLibrarian.jsx'
 import { AuthProvider } from '@/context/AuthContext.jsx'
 import { NoPage } from './noPage/Nopage.jsx'
+import { BookProvider } from '@/context/BooksContext.jsx'
 const index = () => {
     return (
         <AuthProvider>
-            <Navbar />
-            <main className='flex-1 flex flex-col'>
-                <Routes>
-                    <Route path='/' element={<Home />} />
-                    <Route path='/librarian-login' element={
-                        <PublicRouteForLibrarian>
-                            <LibrarianLogin />
-                        </PublicRouteForLibrarian>} />
-                    <Route path='/librarian-dashboard' element={
-                        <ProtectedRouteForLibrarian>
-                            <LibrarianDashboard />
-                        </ProtectedRouteForLibrarian>} />
-                    <Route path='*' element={<NoPage />} />
-                </Routes>
-            </main>
-            <Toaster />
-            <Footer />
+            <BookProvider>
+                <Navbar />
+                <main className='flex-1 flex flex-col'>
+                    <Routes>
+                        <Route path='/' element={<Home />} />
+                        <Route path='/librarian-login' element={
+                            <PublicRouteForLibrarian>
+                                <LibrarianLogin />
+                            </PublicRouteForLibrarian>} />
+                        <Route path='/librarian-dashboard' element={
+                            <ProtectedRouteForLibrarian>
+                                <LibrarianDashboard />
+                            </ProtectedRouteForLibrarian>} />
+                        <Route path='*' element={<NoPage />} />
+                    </Routes>
+                </main>
+                <Toaster />
+                <Footer />
+            </BookProvider>
         </AuthProvider>
     )
 }

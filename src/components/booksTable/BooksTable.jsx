@@ -1,9 +1,12 @@
 import React from 'react'
-import { Book, BookAIcon, BookOpen, BookOpenText, Download, EllipsisVertical, SquarePen } from 'lucide-react'
+import { Book, BookAIcon, BookOpen, BookOpenText, Download, EllipsisVertical, Loader, Loader2, SquarePen } from 'lucide-react'
 import { DeleteBook } from '@/pages/dashboard/librarianDasboard/DeleteBook';
 import { toast } from 'react-hot-toast';
+import { useBooks } from '@/context/BooksContext';
 
-export const BooksTable = ({ books, readers, updateStatus, handleEditBook, loading, isAdmin = false }) => {
+export const BooksTable = ({ books, readers, handleEditBook, loading, isAdmin = false }) => {
+
+  const { updateStatus, updatingBookId } = useBooks();
 
   const SkeletonRow = () => (
     <tr className="animate-pulse">
@@ -103,20 +106,27 @@ export const BooksTable = ({ books, readers, updateStatus, handleEditBook, loadi
                       Download <Download size={20} />
                     </button>
                   </td>
-                  <td className="py-4 text-center whitespace-nowrap">
-                    <select
-                      className={`select select-sm w-full min-w-30 ${book.status === 'library' ? 'select-success' : 'select-error'}`}
-                      value={book.status}
-                      onChange={(e) => updateStatus(book.id, e.target.value)}
-                    >
-                      {!isAdmin && <option value="library">اسٹیٹس</option>}
-                      {isAdmin && <option value="library">لائبریری</option>}
-                      {readers.filter(reader => isAdmin || reader.name !== "library").map((reader) => (
-                        <option key={reader.id} value={reader.name}>{reader.name}</option>
-                      ))}
-                    </select>
+                  <td className="py-4 text-center whitespace-nowrap relative">
+                    <div className="relative flex items-center justify-center">
+                      <select
+                        className={`select select-sm w-full min-w-30 ${book.status === 'library' ? 'select-success' : 'select-error'} ${updatingBookId === book.id ? 'opacity-50' : ''}`}
+                        value={book.status}
+                        disabled={updatingBookId === book.id}
+                        onChange={(e) => updateStatus(book.id, e.target.value)}
+                      >
+                        {!isAdmin && <option value="library">اسٹیٹس</option>}
+                        {isAdmin && <option value="library">لائبریری</option>}
+                        {readers.filter(reader => isAdmin || reader.name !== "library").map((reader) => (
+                          <option key={reader.id} value={reader.name}>{reader.name}</option>
+                        ))}
+                      </select>
+                      {updatingBookId === book.id && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-base-100/20 rounded-lg">
+                          <Loader className="animate-spin text-neutral" size={18} />
+                        </div>
+                      )}
+                    </div>
                   </td>
-                  
                   {isAdmin && (
                     <td className="pt-6 text-center">
                       <div className="dropdown dropdown-left">
