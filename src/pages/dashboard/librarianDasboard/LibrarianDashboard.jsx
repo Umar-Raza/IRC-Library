@@ -50,23 +50,17 @@ export const LibrarianDashboard = () => {
     e.preventDefault()
     setIsProcessing(true)
 
-
-    // Generate search keywords for the book (for future search optimization)
+    // Generate search keywords
     const generateKeywords = (name) => {
       if (!name) return [];
       const lowerName = name.toLowerCase().trim();
       const keywords = new Set();
-
-      // 1. پورے نام کے ٹکڑے بنانا (بشمول اسپیس)
-      // مثال: "بانگ درا" -> "ب", "با", "بان", "بانگ ", "بانگ د"...
       let fullTerm = "";
       for (const char of lowerName) {
         fullTerm += char;
         keywords.add(fullTerm);
       }
-
-      // 2. ہر لفظ کے الگ سے بھی ٹکڑے بنانا (تاکہ دوسرے لفظ سے بھی سرچ ہو سکے)
-      const words = lowerName.split(/\s+/); // ایک سے زیادہ اسپیس کو بھی ہینڈل کرے گا
+      const words = lowerName.split(/\s+/);
       words.forEach(word => {
         let curr = "";
         for (const char of word) {
@@ -74,21 +68,15 @@ export const LibrarianDashboard = () => {
           keywords.add(curr);
         }
       });
-
       return Array.from(keywords);
     };
-
 
     const { titlePage, createdAt, ...restOfData } = state;
     let imageUrl = state.titlePage;
 
+    // Image Upload Logic
     if (titlePage && titlePage instanceof File) {
-      const options = {
-        maxSizeMB: 0.2,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      }
-
+      const options = { maxSizeMB: 0.2, maxWidthOrHeight: 1920, useWebWorker: true };
       let compressedTitlePage = titlePage;
       try {
         compressedTitlePage = await imageCompression(titlePage, options);
@@ -111,24 +99,25 @@ export const LibrarianDashboard = () => {
 
     try {
       if (editingBookId) {
-        // 1. Update existing book in Firebase
         const bookRef = doc(firestore, 'books', editingBookId);
         const updatedBookData = {
           ...restOfData,
           titlePage: imageUrl,
+          searchKeywords: generateKeywords(state.bookName), 
+          updatedAt: new Date()
         };
         await updateDoc(bookRef, updatedBookData);
 
-        // 2. Update Context State
-        setBooks(prevBooks =>
-          prevBooks.map(book =>
+        setBooks(prevBooks => {
+          const updatedList = prevBooks.map(book =>
             book.id === editingBookId ? { ...book, ...updatedBookData } : book
-          )
-        );
+          );
+          const uniqueMap = new Map(updatedList.map(item => [item.id, item]));
+          return Array.from(uniqueMap.values());
+        });
 
         toast.success('!کتاب اپڈیٹ ہوگئی ہے');
       } else {
-        // 1. Add new book to Firebase
         const now = new Date();
         const newBookData = {
           ...restOfData,
@@ -138,14 +127,17 @@ export const LibrarianDashboard = () => {
         };
         const docRef = await addDoc(collection(firestore, 'books'), newBookData);
 
-        // 2. Update Context State
         const newBookForState = {
           id: docRef.id,
           ...newBookData,
-          createdAt: { toDate: () => now }
+          createdAt: { toDate: () => now } 
         };
 
-        setBooks(prevBooks => [newBookForState, ...prevBooks]);
+        setBooks(prevBooks => {
+          const combined = [newBookForState, ...prevBooks];
+          const uniqueMap = new Map(combined.map(item => [item.id, item]));
+          return Array.from(uniqueMap.values());
+        });
 
         toast.success('!کتاب ایڈ ہوگئی ہے');
       }
@@ -157,13 +149,11 @@ export const LibrarianDashboard = () => {
       }
     } catch (err) {
       console.log(err)
-      toast.error('Failed to add book')
+      toast.error('کتاب محفوظ کرنے میں ناکامی ہوئی')
     } finally {
       setIsProcessing(false)
       setEditingBookId(null)
     }
-
-
   }
 
   //  Loading readers from database with real-time updates
@@ -221,28 +211,6 @@ export const LibrarianDashboard = () => {
     document.getElementById('my_modal_4').showModal();
   };
 
-  // Filter books based on search term
-  // const filteredBooks = books
-  //   .filter((book) => {
-  //     const searchLower = searchTerm.toLowerCase();
-  //     const matchesSearch =
-  //       book.bookName?.toLowerCase().includes(searchLower) ||
-  //       book.author?.toLowerCase().includes(searchLower);
-  //     const matchesSubject = subjectFilter === "" || subjectFilter === "کتابوں کی قسمیں" || book.subject === subjectFilter;
-  //     return matchesSearch && matchesSubject;
-  //   })
-  //   .sort((a, b) => {
-  //     const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(0);
-  //     const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(0);
-
-  //     if (sortOrder === 'نئی کتابیں') return dateB.getTime() - dateA.getTime();
-  //     if (sortOrder === 'پرانی کتابیں') return dateA.getTime() - dateB.getTime();
-  //     if (sortOrder === 'ا → ے') return (a.bookName || "").localeCompare((b.bookName || ""), 'ur');
-  //     if (sortOrder === 'ے → ا') return (b.bookName || "").localeCompare((a.bookName || ""), 'ur');
-  //     return 0;
-  //   });
-
-
   return (
     <div className="card bg-base-100 shadow-xl my-4 w-[98%] lg:w-[94%] xl:w-[92%] mx-auto border border-base-200">
       <div className="card-body p-3 sm:p-6 md:p-8 zain-light">
@@ -257,6 +225,7 @@ export const LibrarianDashboard = () => {
             </button>
             <button className="btn btn-neutral btn-sm md:btn-md flex-1 lg:flex-none" onClick={() => document.getElementById('reader_modal').showModal()}>Manage Readers</button>
             <button className="btn btn-neutral btn-sm md:btn-md flex-1 lg:flex-none" onClick={() => { setEditingBookId(null); setState(initialState); document.getElementById('my_modal_4').showModal() }}>Add Book</button>
+
           </div>
           <dialog id="my_modal_4" className="modal" dir='rtl'>
             <div className="modal-box w-11/12 max-w-5xl">
@@ -294,7 +263,7 @@ export const LibrarianDashboard = () => {
         <div className=" rounded-xl p-4 mb-6 border border-base-300" dir="rtl">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
             <div className="md:col-span-6">
-              <SearchBooks onSearch={searchBooksInFirestore} />
+              <SearchBooks onSearch={searchBooksInFirestore} setSearchTerm={setSearchTerm} />
             </div>
             <span className='md:col-span-3'>
               <select
@@ -325,37 +294,54 @@ export const LibrarianDashboard = () => {
             </span>
           </div>
         </div>
-
         <div className="relative overflow-x-auto">
-          <BooksTable
-            loading={books.length === 0 && !searchTerm}
-            books={books || []}
-            readers={readers}
-            updateStatus={updateStatus}
-            handleEditBook={handleEditBook}
-            searchTerm={searchTerm}
-            isAdmin={true}
-          />
-          <div className="flex justify-center my-8">
-            {hasMore && (
-              <button onClick={fetchMore} className="btn btn-neutral px-10" disabled={loading || loadingMore}>
-                {loadingMore ? (
-                  <>
-                    <Loader className="w-5 h-5 animate-spin mx-2" />
-                    <span>لوڈ ہو رہا ہے</span>
-                  </>
-                ) : 'مزید کتابیں دیھکیں'}
-              </button>
-            )}
-          </div>
+          {(loading || books.length > 0) ? (
+            <BooksTable
+              loading={loading}
+              books={books || []}
+              readers={readers}
+              updateStatus={updateStatus}
+              handleEditBook={handleEditBook}
+              searchTerm={searchTerm}
+              isAdmin={true}
+            />
+          ) : null}
+
+          {!loading && books.length === 0 && (
+            <div className="py-20 text-center rounded-xl my-4">
+              <SearchX size={64} className="mx-auto mb-4 text-base-content/20" />
+              <h3 className="text-3xl font-bold text-base-content/50 zain-light">
+                معذرت! کوئی کتاب نہیں ملی۔
+              </h3>
+            </div>
+          )}
         </div>
-        {!loading && books.length === 0 && searchTerm && (
-          <div className="py-20 text-center">
-            <SearchX size={64} className="mx-auto mb-4 text-base-content/20" />
-            <h3 className="text-3xl font-bold text-base-content/50">معذرت! "{searchTerm}" کے رزلٹ نہیں ملے۔</h3>
+
+        {hasMore && books.length > 0 && (
+          <div className="flex justify-center my-3">
+
+            <button
+              onClick={() => {
+                if (searchTerm.trim()) {
+                  searchBooksInFirestore(searchTerm, true); 
+                } else {
+                  fetchMore(false); 
+                }
+              }}
+              className="btn btn-neutral px-10"
+              disabled={loading || loadingMore}
+            >
+              {loadingMore ? (
+                <>
+                  <Loader className="w-5 h-5 animate-spin mx-2" />
+                  <span>لوڈ ہو رہا ہے</span>
+                </>
+              ) : 'مزید کتابیں دیکھیں'}
+            </button>
           </div>
         )}
-      </div >
+
+      </div>
 
       {/* Add new reader modal */}
       <dialog id="reader_modal" className="modal font-sans">

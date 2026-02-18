@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore'
-import { Loader,  SearchIcon, SearchX } from 'lucide-react'
+import { Loader, SearchIcon, SearchX } from 'lucide-react'
 import { firestore } from '@/config/Firebase';
 import { BooksTable } from '@/components/booksTable/BooksTable';
 import { SearchBooks } from '@/components/searchBooks/SearchBooks';
-import { ChevronDown,  } from 'lucide-react';
+import { ChevronDown, } from 'lucide-react';
 import { useBooks } from '@/context/BooksContext';
 export const Home = () => {
-    
+
     const [searchTerm, setSearchTerm] = useState('');
     const [subjectFilter, setSubjectFilter] = useState('');
     const [sortOrder, setSortOrder] = useState('نئی کتابیں');
@@ -18,9 +18,9 @@ export const Home = () => {
     const [isSortOpen, setIsSortOpen] = useState(false);
     const sortRef = useRef(null);
     const sortOptions = ["نئی کتابیں", "پرانی کتابیں", "ا → ے", "ے → ا"];
-    
+
     //  Books Context
-    const { books, loading, loadingMore, hasMore, fetchMore, updateStatus } = useBooks();
+    const { books, loading, loadingMore, hasMore, fetchMore, updateStatus, searchBooksInFirestore, repairAllKeywords } = useBooks();
 
     useEffect(() => {
         const q = query(collection(firestore, 'readers'), orderBy('name', 'asc'));
@@ -89,7 +89,10 @@ export const Home = () => {
                 <div className="bg-base-100 rounded-xl shadow  border border-base-300 p-4 mb-2" dir="rtl">
                     <div className="flex flex-col lg:flex-row items-stretch gap-3">
                         <div className="flex-1 lg:flex-2 min-w-0">
-                            <SearchBooks onSearch={(value) => setSearchTerm(value)} />
+                            <SearchBooks onSearch={(value) => {
+                                setSearchTerm(value);
+                                searchBooksInFirestore(value);
+                            }} />
                         </div>
 
                         <div className="relative w-full md:w-1/4 text-[16px]" ref={dropdownRef} dir="rtl">
@@ -188,11 +191,11 @@ export const Home = () => {
                         <div className="py-20 text-center bg-base-200/20 rounded-xl">
                             <SearchX size={64} className="mx-auto mb-4 text-base-content/20" />
                             <h3 className="text-3xl font-bold text-base-content/50 noto-naskh-arabic-font">معذرت! کوئی کتاب نہیں ملی۔</h3>
-                            <p className="text-xl mt-2 text-base-content/40">دوسرے الفاظ استعمال کر کے سرچ کریں۔</p>
+                            <p className="text-xl mt-2 text-base-content/40">الفاظ بدل کر سرچ کریں۔</p>
                         </div>
                     ) : (
                         <BooksTable
-                            books={filteredBooks}
+                            books={books}
                             loading={loading}
                             isAdmin={false}
                             readers={readers}
@@ -202,20 +205,28 @@ export const Home = () => {
 
                     )}
                 </div>
-
-                <div className="flex justify-center my-8">
-                    {hasMore && (
-                        <button onClick={fetchMore} className="btn btn-neutral px-10" disabled={loading || loadingMore}>
+                <div className="flex justify-center my-3">
+                    {hasMore && books.length > 0 && (
+                        <button
+                            onClick={() => {
+                                if (searchTerm.trim()) {
+                                    searchBooksInFirestore(searchTerm, true);
+                                } else {
+                                    fetchMore(false);
+                                }
+                            }}
+                            className="btn btn-neutral px-10"
+                            disabled={loading || loadingMore}
+                        >
                             {loadingMore ? (
                                 <>
                                     <Loader className="w-5 h-5 animate-spin mx-2" />
                                     <span>لوڈ ہو رہا ہے</span>
                                 </>
-                            ) : 'مزید کتابیں دیھکیں'}
+                            ) : 'مزید کتابیں دیکھیں'}
                         </button>
                     )}
                 </div>
-
             </div>
         </div>
     )

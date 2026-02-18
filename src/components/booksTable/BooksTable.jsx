@@ -107,21 +107,21 @@ export const BooksTable = ({ books, readers, handleEditBook, loading, isAdmin = 
                     </button>
                   </td>
                   <td className="py-4 text-center whitespace-nowrap relative">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-center gap-2 relative">
                       <select
                         className={`select select-sm w-full min-w-30 ${book.status === 'library' ? 'select-success' : 'select-error'}`}
                         value={book.status}
-                        disabled={updatingBookId === book.id} // لوڈنگ کے دوران ڈس ایبل کر دیں
+                        disabled={updatingBookId === book.id}
                         onChange={(e) => updateStatus(book.id, e.target.value)}
                       >
                         {!isAdmin && <option value="library">اسٹیٹس</option>}
                         {isAdmin && <option value="library">لائبریری</option>}
-                        {readers.filter(reader => isAdmin || reader.name !== "library").map((reader) => (
+                        {readers.map((reader) => (
                           <option key={reader.id} value={reader.name}>{reader.name}</option>
                         ))}
                       </select>
                       {updatingBookId === book.id && (
-                        <Loader className="ml-2" size={16} />
+                        <Loader className="animate-spin absolute" size={16} />
                       )}
                     </div>
                   </td>
