@@ -31,7 +31,7 @@ export const BooksTable = ({ books, readers, handleEditBook, loading, isAdmin = 
     <>
       <div className="relative overflow-x-auto max-h-[70vh]" dir="rtl">
         <table className="table w-full min-w-200 zain-light">
-          <thead className="bg-neutral sticky top-0 z-10 text-neutral-content">
+          <thead className="bg-neutral sticky top-0 text-neutral-content z-20">
             <tr>
               <th className="w-10">#</th>
               <th className="w-20">تصویر</th>
@@ -47,31 +47,38 @@ export const BooksTable = ({ books, readers, handleEditBook, loading, isAdmin = 
               [...Array(10)].map((_, i) => <SkeletonRow key={i} />)
             ) : (
               books.map((book, index) => (
-                <tr key={book.id} className="border-b border-base-300 align-top hover:bg-base-200/40">
+                <tr key={book.id} className="border-b border-base-300 align-top">
                   <td className="py-4 font-bold">{index + 1}</td>
                   <td className="py-4">
-                    <div className="dropdown dropdown-right dropdown-hover relative">
+                    <div className={`dropdown dropdown-hover relative ${index < 2 ? 'dropdown-bottom' :
+                      index > books.length - 3 ? 'dropdown-top' : 'dropdown-right'}`}>
+
                       {book.createdAt && (new Date() - book.createdAt.toDate()) / (1000 * 60 * 60 * 24) <= 15 && (
-                        <span className="badge badge-accent badge-sm font-sans animate-pulse absolute bottom-17 -right-7 z-8">NEW</span>
+                        <span className="badge badge-accent badge-sm font-sans animate-pulse absolute bottom-17 -right-7 z-[10]">NEW</span>
                       )}
+
                       {book.titlePage ? (
                         <img
-                          src={book.titlePage || null}
+                          src={book.titlePage}
                           className="w-18 h-21 rounded-sm object-cover shadow cursor-pointer"
                           alt={book.bookName}
                         />
                       ) : (
-                        <div className="w-18 h-21 bg-base-200 rounded-sm flex items-center justify-center text-[10px] text-center">{book.bookName}</div>
+                        <div className="w-18 h-21 bg-base-200 rounded-sm flex items-center justify-center text-[10px] text-center p-1">
+                          {book.bookName}
+                        </div>
                       )}
-
-                      <div className="dropdown-content z-999 card card-compact w-48 p-1 shadow bg-base-100 border border-base-300 ml-2">
+                      <div className={`dropdown-content z-1 card card-compact w-48 p-1 shadow-2xl bg-base-100 border border-base-300 ${index < 2 ? 'mt-2' : index > books.length - 3 ? 'mb-2' : 'ml-2'}`}>
                         {book.titlePage ? (
-                          <img src={book.titlePage || null} className="w-48 h-64 rounded-lg" alt={book.bookName} />
+                          <img src={book.titlePage} className="w-48 h-64 rounded-lg object-cover" alt={book.bookName} />
                         ) : (
-                          <div className="w-46 h-20 bg-base-200 rounded-lg flex items-center justify-center"><Book size={32} className="text-base-400 " /></div>
+                          <div className="w-full h-48 bg-base-200 rounded-lg flex items-center justify-center">
+                            <Book size={32} className="text-base-400" />
+                          </div>
                         )}
+
                         <div className="card-body p-2">
-                          <h3 className="card-title mx-auto text-sm text-center">{book.bookName}</h3>
+                          <h3 className="card-title mx-auto text-sm text-center leading-tight">{book.bookName}</h3>
                         </div>
                       </div>
                     </div>
@@ -106,10 +113,10 @@ export const BooksTable = ({ books, readers, handleEditBook, loading, isAdmin = 
                       Download <Download size={20} />
                     </button>
                   </td>
-                  <td className="py-4 text-center whitespace-nowrap relative">
-                    <div className="flex items-center justify-center gap-2 relative">
+                  <td className="py-4 text-center whitespace-nowrap">
+                    <div className="relative flex items-center justify-center w-full min-w-32 h-10">
                       <select
-                        className={`select select-sm w-full min-w-30 ${book.status === 'library' ? 'select-success' : 'select-error'}`}
+                        className={`select select-sm w-full font-sans ${book.status === 'library' ? 'select-success' : 'select-error'} ${updatingBookId === book.id ? 'opacity-70' : ''}`}
                         value={book.status}
                         disabled={updatingBookId === book.id}
                         onChange={(e) => updateStatus(book.id, e.target.value)}
@@ -120,12 +127,14 @@ export const BooksTable = ({ books, readers, handleEditBook, loading, isAdmin = 
                           <option key={reader.id} value={reader.name}>{reader.name}</option>
                         ))}
                       </select>
+
                       {updatingBookId === book.id && (
-                        <Loader className="animate-spin absolute" size={16} />
+                        <div className='absolute inset-0 flex items-center justify-center pointer-events-none'>
+                          <Loader className="animate-spin text-neutral" size={20} />
+                        </div>
                       )}
                     </div>
                   </td>
-
                   {isAdmin && (
                     <td className="pt-6 text-center">
                       <div className="dropdown dropdown-left">

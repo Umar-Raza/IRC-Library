@@ -118,7 +118,7 @@ export const Home = () => {
                                             />
                                         </div>
                                     </div>
-                                    <ul className="max-h-60 overflow-y-auto p-1">
+                                    <ul className="max-h-60 overflow-y-auto p-1 z-999">
                                         <li
                                             className={`p-2 hover:bg-neutral hover:text-white rounded cursor-pointer ${subjectFilter === "" ? 'bg-neutral text-white' : ''}`}
                                             onClick={() => {

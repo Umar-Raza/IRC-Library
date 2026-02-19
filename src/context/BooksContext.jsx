@@ -110,7 +110,7 @@ export const BookProvider = ({ children }) => {
             };
             await updateDoc(bookRef, updateData);
             setBooks(prev => prev.map(b => b.id === bookId ? { ...b, ...updateData } : b));
-            toast.success(` ${newStatus}: اسٹیٹس اپڈیٹ ہو گیا `);
+            toast.success(`Status updated to: ${newStatus}`);
         } catch (error) {
             toast.error("اسٹیٹس اپڈیٹ ہونے میں ایرر آرہا ہے!");
         } finally {
