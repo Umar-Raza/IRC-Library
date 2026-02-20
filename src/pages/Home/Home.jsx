@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { collection, query, orderBy, onSnapshot } from 'firebase/firestore'
+import { collection, query, orderBy, onSnapshot, getDocs } from 'firebase/firestore'
 import { Loader, SearchIcon, SearchX } from 'lucide-react'
 import { firestore } from '@/config/Firebase';
 import { BooksTable } from '@/components/booksTable/BooksTable';
@@ -8,19 +8,33 @@ import { ChevronDown, } from 'lucide-react';
 import { useBooks } from '@/context/BooksContext';
 export const Home = () => {
 
-    const [searchTerm, setSearchTerm] = useState('');
     const [subjectFilter, setSubjectFilter] = useState('');
-    const [sortOrder, setSortOrder] = useState('نئی کتابیں');
+    const [sortOrder, setSortOrder] = useState('ترتیب منتخب کریں');
     const [readers, setReaders] = useState([]);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [subjectSearch, setSubjectSearch] = useState("");
     const dropdownRef = useRef(null);
     const [isSortOpen, setIsSortOpen] = useState(false);
     const sortRef = useRef(null);
-    const sortOptions = ["نئی کتابیں", "پرانی کتابیں", "ا → ے", "ے → ا"];
+    const sortOptions = ["ا → ے", "ے → ا"];
+    const [availableSubjects, setAvailableSubjects] = useState([]);
 
     //  Books Context
-    const { books, loading, loadingMore, hasMore, fetchMore, updateStatus, searchBooksInFirestore, repairAllKeywords } = useBooks();
+    const { books, loading, loadingMore, hasMore, fetchMore, updateStatus, totalBooks, selectedSubject, setSelectedSubject, searchTerm, setSearchTerm, sortBy, setSortBy } = useBooks();
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+                setIsDropdownOpen(false);
+                setSubjectSearch("");
+            }
+            if (sortRef.current && !sortRef.current.contains(e.target)) {
+                setIsSortOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     useEffect(() => {
         const q = query(collection(firestore, 'readers'), orderBy('name', 'asc'));
@@ -31,67 +45,43 @@ export const Home = () => {
         return () => unsubscribe();
     }, []);
 
-
-
-    const filteredBooks = books
-        .filter((book) => {
-            const searchLower = searchTerm.toLowerCase();
-            const matchesSearch =
-                book.bookName?.toLowerCase().includes(searchLower) ||
-                book.author?.toLowerCase().includes(searchLower);
-            const matchesSubject = subjectFilter === "" || book.subject === subjectFilter;
-            return matchesSearch && matchesSubject;
-        })
-        .sort((a, b) => {
-            const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(0);
-            const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(0);
-
-            if (sortOrder === 'نئی کتابیں') return dateB.getTime() - dateA.getTime();
-            if (sortOrder === 'پرانی کتابیں') return dateA.getTime() - dateB.getTime();
-            if (sortOrder === 'ا → ے') return (a.bookName || "").localeCompare((b.bookName || ""), 'ur');
-            if (sortOrder === 'ے → ا') return (b.bookName || "").localeCompare((a.bookName || ""), 'ur');
-            return 0;
-        });
-
     useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setIsDropdownOpen(false);
-            }
-            if (sortRef.current && !sortRef.current.contains(event.target)) {
-                setIsSortOpen(false);
+        const fetchSubjects = async () => {
+            try {
+                const snapshot = await getDocs(collection(firestore, 'books'));
+                const uniqueSubjects = [
+                    ...new Set(snapshot.docs.map(doc => doc.data().subject))
+                ].filter(Boolean).sort();
+                setAvailableSubjects(uniqueSubjects);
+            } catch (error) {
+                console.error("Subjects load error:", error);
             }
         };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
+        fetchSubjects();
     }, []);
 
-
-    const allSubjects = [...new Set(books.map(book => book.subject))].filter(Boolean);
-    const filteredSubjects = allSubjects.filter(s =>
+    const filteredSubjects = availableSubjects.filter(s =>
         s.toLowerCase().includes(subjectSearch.toLowerCase())
     );
-
     return (
-        <div className="card bg-base-100 shadow-xl my-4 w-[98%] lg:w-[94%] xl:w-[92%] mx-auto border border-base-200 font-zain-light">
+        <div className="card bg-base-100 shadow-xl my-4 w-[98%] zain-light lg:w-[94%] xl:w-[92%] mx-auto border border-base-200 ">
             <div className="card-body">
-                <div className="flex flex-row items-center justify-center gap-2 py-4 text-sm sm:text-lg text-neutral" dir="rtl">
+                <div className="flex flex-wrap items-center justify-center gap-2 py-4 text-sm sm:text-lg text-neutral" dir="rtl">
                     <span>اسلامک ریسرچ سینٹر فیصل آباد میں کل</span>
-                    <span className="font-bold bg-neutral text-white px-2 py-0.5 rounded-lg shrink-0">
-                        {loading ? (
-                            <Loader className="w-5 h-5  animate-spin mx-1" />
+                    <span className="inline-flex items-center justify-center font-bold bg-neutral text-white px-3 py-0.5 rounded-lg min-w-[2.5rem]">
+                        {totalBooks === 0 ? (
+                            <Loader className="w-4 h-4 animate-spin" />
                         ) : (
-
-                            <span> {books.length}</span>
+                            totalBooks
                         )}
-                    </span>مجلدات موجود ہیں۔
+                    </span>
+                    <span>مجلدات موجود ہیں۔</span>
                 </div>
                 <div className="bg-base-100 rounded-xl shadow  border border-base-300 p-4 mb-2" dir="rtl">
-                    <div className="flex flex-col lg:flex-row items-stretch gap-3">
+                    <div className="flex flex-col md:flex-row items-stretch gap-3">
                         <div className="flex-1 lg:flex-2 min-w-0">
                             <SearchBooks onSearch={(value) => {
                                 setSearchTerm(value);
-                                searchBooksInFirestore(value);
                             }} />
                         </div>
 
@@ -100,9 +90,10 @@ export const Home = () => {
                                 className="input input-bordered flex items-center text-base-content/60 justify-between cursor-pointer"
                                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                             >
-                                <span className="truncate">{subjectFilter || "تمام مضامین"}</span>
+                                <span className="truncate">{selectedSubject === "All" || !selectedSubject ? "تمام مضامین" : selectedSubject}</span>
                                 <ChevronDown size={18} className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
                             </div>
+
                             {isDropdownOpen && (
                                 <div className="absolute z-50 w-full mt-1 bg-base-100 border border-base-300 rounded-lg shadow-xl overflow-hidden">
                                     <div className="p-2 border-b border-base-200 bg-base-200/50">
@@ -120,22 +111,26 @@ export const Home = () => {
                                     </div>
                                     <ul className="max-h-60 overflow-y-auto p-1 z-999">
                                         <li
-                                            className={`p-2 hover:bg-neutral hover:text-white rounded cursor-pointer ${subjectFilter === "" ? 'bg-neutral text-white' : ''}`}
+                                            className={`p-2 hover:bg-neutral hover:text-white rounded cursor-pointer ${selectedSubject === "All" ? 'bg-neutral text-white' : ''}`}
                                             onClick={() => {
-                                                setSubjectFilter("");
+                                                setSelectedSubject("All");
                                                 setIsDropdownOpen(false);
                                                 setSubjectSearch("");
                                             }}
                                         >
                                             تمام مضامین
                                         </li>
-                                        {filteredSubjects.length > 0 ? (
+                                        {filteredSubjects.length === 0 && subjectSearch !== "" ? (
+                                            <li className="p-3 text-center text-base-content/50 text-sm">
+                                                معذرت! <span className="font-bold text-neutral">"{subjectSearch}"</span> کا مضمون نہیں ملا۔
+                                            </li>
+                                        ) : (
                                             filteredSubjects.map((subject) => (
                                                 <li
                                                     key={subject}
-                                                    className={`p-2 hover:bg-neutral hover:text-white rounded cursor-pointer mt-1 ${subjectFilter === subject ? 'bg-neutral text-white' : ''}`}
+                                                    className={`p-2 hover:bg-neutral hover:text-white rounded cursor-pointer mt-1 ${selectedSubject === subject ? 'bg-neutral text-white' : ''}`}
                                                     onClick={() => {
-                                                        setSubjectFilter(subject);
+                                                        setSelectedSubject(subject);
                                                         setIsDropdownOpen(false);
                                                         setSubjectSearch("");
                                                     }}
@@ -143,8 +138,6 @@ export const Home = () => {
                                                     {subject}
                                                 </li>
                                             ))
-                                        ) : (
-                                            <li className="p-2 text-center text-sm text-base-content/40">کوئی مضمون نہیں ملا</li>
                                         )}
                                     </ul>
                                 </div>
@@ -174,6 +167,8 @@ export const Home = () => {
                                                 className={`p-2.5 hover:bg-neutral hover:text-white rounded-lg cursor-pointer transition-colors text-sm mt-1 ${sortOrder === option ? 'bg-neutral text-white' : 'hover:bg-base-200'}`}
                                                 onClick={() => {
                                                     setSortOrder(option);
+                                                    if (option === "ا → ے") setSortBy('a-z');
+                                                    else setSortBy('newest');
                                                     setIsSortOpen(false);
                                                 }}
                                             >
@@ -187,11 +182,17 @@ export const Home = () => {
                     </div>
                 </div>
                 <div className="relative">
-                    {!loading && filteredBooks.length === 0 ? (
-                        <div className="py-20 text-center bg-base-200/20 rounded-xl">
+                    {!loading && books.length === 0 ? (
+                        <div className="py-20 text-center bg-base-200/20 rounded-xl border border-dashed border-base-300">
                             <SearchX size={64} className="mx-auto mb-4 text-base-content/20" />
-                            <h3 className="text-3xl font-bold text-base-content/50 noto-naskh-arabic-font">معذرت! کوئی کتاب نہیں ملی۔</h3>
-                            <p className="text-xl mt-2 text-base-content/40">الفاظ بدل کر سرچ کریں۔</p>
+                            <h3 className="text-3xl font-bold text-base-content/50 noto-naskh-arabic-font">
+                                معذرت! کوئی کتاب نہیں ملی۔
+                            </h3>
+                            <p className="text-xl mt-2 text-base-content/40">
+                                {searchTerm
+                                    ? `آپ کی تلاش "${searchTerm}" کے مطابق کوئی نتیجہ نہیں ملا۔`
+                                    : "اس مضمون میں فی الحال کوئی کتاب دستیاب نہیں ہے۔"}
+                            </p>
                         </div>
                     ) : (
                         <BooksTable
@@ -202,19 +203,12 @@ export const Home = () => {
                             updateStatus={updateStatus}
                             searchTerm={searchTerm}
                         />
-
                     )}
                 </div>
                 <div className="flex justify-center my-3">
                     {hasMore && books.length > 0 && (
                         <button
-                            onClick={() => {
-                                if (searchTerm.trim()) {
-                                    searchBooksInFirestore(searchTerm, true);
-                                } else {
-                                    fetchMore(false);
-                                }
-                            }}
+                            onClick={() => fetchMore(false)}
                             className="btn btn-neutral px-10"
                             disabled={loading || loadingMore}
                         >

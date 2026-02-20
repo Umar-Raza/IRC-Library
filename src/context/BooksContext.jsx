@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { collection, query, orderBy, limit, startAfter, getDocs, doc, updateDoc, where } from 'firebase/firestore';
+import { collection, query, orderBy, limit, startAfter, getDocs, doc, updateDoc, where, getCountFromServer } from 'firebase/firestore';
 import { firestore } from '@/config/Firebase';
 import toast from 'react-hot-toast';
 
@@ -12,23 +12,58 @@ export const BookProvider = ({ children }) => {
     const [lastDoc, setLastDoc] = useState(null);
     const [hasMore, setHasMore] = useState(true);
     const [updatingBookId, setUpdatingBookId] = useState(null);
+    const [selectedSubject, setSelectedSubject] = useState('All');
+    const [sortBy, setSortBy] = useState('newest');
+    const [searchTerm, setSearchTerm] = useState("");
+    const [totalBooks, setTotalBooks] = useState(0); 
+
+    useEffect(() => {
+        const fetchTotalCount = async () => {
+            try {
+                const snapshot = await getCountFromServer(collection(firestore, 'books'));
+                setTotalBooks(snapshot.data().count);
+            } catch (error) {
+                console.error("Count error:", error);
+            }
+        };
+        fetchTotalCount();
+    }, []);
 
     const fetchBooks = async (isFirstLoad = true) => {
         if (isFirstLoad) {
             setLoading(true);
             setBooks([]);
+            setLastDoc(null);
         } else {
             setLoadingMore(true);
         }
 
         try {
             const booksRef = collection(firestore, 'books');
-            let q = query(booksRef, orderBy('createdAt', 'desc'), limit(10));
+            let constraints = [];
 
-            if (!isFirstLoad && lastDoc) {
-                q = query(booksRef, orderBy('createdAt', 'desc'), startAfter(lastDoc), limit(10));
+            if (selectedSubject && selectedSubject !== "All" && selectedSubject !== "") {
+                constraints.push(where('subject', '==', selectedSubject));
             }
 
+            if (searchTerm && searchTerm.trim() !== "") {
+                const searchVal = searchTerm.toLowerCase().trim();
+                constraints.push(where('searchKeywords', 'array-contains', searchVal));
+            }
+
+            if (sortBy === 'a-z') {
+                constraints.push(orderBy('bookName', 'asc'));
+            } else {
+                constraints.push(orderBy('createdAt', 'desc'));
+            }
+
+            if (!isFirstLoad && lastDoc) {
+                constraints.push(startAfter(lastDoc));
+            }
+
+            constraints.push(limit(10));
+
+            const q = query(booksRef, ...constraints);
             const snapshot = await getDocs(q);
             const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
@@ -40,64 +75,15 @@ export const BookProvider = ({ children }) => {
 
             setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
             setHasMore(snapshot.docs.length === 10);
+
         } catch (error) {
-            console.error("Error fetching books:", error);
-            toast.error("کتابیں لوڈ کرنے میں مسئلہ ہوا");
-        } finally {
-            setLoading(false);
-            setLoadingMore(false);
-        }
-    };
-    const searchBooksInFirestore = async (term, isNextPage = false) => {
-        if (!term.trim()) {
-            fetchBooks(true);
-            return;
-        }
-
-        if (isNextPage) setLoadingMore(true);
-        else {
-            setLoading(true);
             setBooks([]);
-        }
-
-        try {
-            let q = query(
-                collection(firestore, "books"),
-                where("searchKeywords", "array-contains", term.toLowerCase()),
-                limit(10)
-            );
-
-            if (isNextPage && lastDoc) {
-                q = query(
-                    collection(firestore, "books"),
-                    where("searchKeywords", "array-contains", term.toLowerCase()),
-                    startAfter(lastDoc),
-                    limit(10)
-                );
-            }
-
-            const snapshot = await getDocs(q);
-            const results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-            setBooks(prev => {
-                const combined = isNextPage ? [...prev, ...results] : results;
-                const uniqueMap = new Map(combined.map(item => [item.id, item]));
-                return Array.from(uniqueMap.values());
-            });
-
-            setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
-            setHasMore(snapshot.docs.length === 10);
-        } catch (err) {
-            console.error("Search Error:", err);
-            toast.error("تلاش کے دوران ایرر آیا");
+            toast.error("ڈیٹا لوڈ کرنے میں مسئلہ ہوا");
         } finally {
             setLoading(false);
             setLoadingMore(false);
         }
     };
-    useEffect(() => {
-        fetchBooks(true);
-    }, []);
 
     const updateStatus = async (bookId, newStatus, readerInfo = null) => {
         setUpdatingBookId(bookId);
@@ -118,11 +104,15 @@ export const BookProvider = ({ children }) => {
         }
     };
 
+    useEffect(() => {
+        fetchBooks(true);
+    }, [selectedSubject, sortBy, searchTerm]);
+
     return (
         <BookContext.Provider value={{
             books, loading, loadingMore, hasMore,
-            updateStatus, searchBooksInFirestore,
-            fetchMore: fetchBooks, updatingBookId, setBooks,
+            updateStatus, totalBooks, 
+            fetchMore: fetchBooks, updatingBookId, setBooks, searchTerm, setSearchTerm, selectedSubject, setSelectedSubject, sortBy, setSortBy
         }}>
             {children}
         </BookContext.Provider>

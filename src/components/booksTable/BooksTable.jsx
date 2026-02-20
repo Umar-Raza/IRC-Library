@@ -26,7 +26,6 @@ export const BooksTable = ({ books, readers, handleEditBook, loading, isAdmin = 
       {isAdmin && <td><div className="h-8 w-8 bg-base-300 rounded mx-auto"></div></td>}
     </tr>
   );
-
   return (
     <>
       <div className="relative overflow-x-auto max-h-[70vh]" dir="rtl">
@@ -68,7 +67,7 @@ export const BooksTable = ({ books, readers, handleEditBook, loading, isAdmin = 
                           {book.bookName}
                         </div>
                       )}
-                      <div className={`dropdown-content z-1 card card-compact w-48 p-1 shadow-2xl bg-base-100 border border-base-300 ${index < 2 ? 'mt-2' : index > books.length - 3 ? 'mb-2' : 'ml-2'}`}>
+                      <div className={`dropdown-content z-11 card card-compact w-48 p-1 shadow-2xl bg-base-100 border border-base-300 ${index < 2 ? 'mt-2' : index > books.length - 3 ? 'mb-2' : 'ml-2'}`}>
                         {book.titlePage ? (
                           <img src={book.titlePage} className="w-48 h-64 rounded-lg object-cover" alt={book.bookName} />
                         ) : (

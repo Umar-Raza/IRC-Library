@@ -1,29 +1,44 @@
 import { useBooks } from '@/context/BooksContext';
-import React, { useRef, useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 export const SearchBooks = () => {
 
-  const { searchBooksInFirestore } = useBooks();
+  const context = useBooks();
+  const inputRef = useRef(null); 
+  const [inputValue, setInputValue] = useState(context?.searchTerm || "");
 
-  // یہ لائن شامل کریں تاکہ ایرر ختم ہو جائے
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const timeoutRef = useRef(null);
+  useEffect(() => {
+    const handleSlash = (e) => {
+      if (e.key === '/' && document.activeElement !== inputRef.current) {
+        e.preventDefault(); 
+        inputRef.current?.focus();
+      }
+    };
+    document.addEventListener('keydown', handleSlash);
+    return () => document.removeEventListener('keydown', handleSlash);
+  }, []);
 
   const handleInputChange = (e) => {
-    const value = e.target.value;
-
-    // اب یہ لائن ایرر نہیں دے گی
-    setSearchTerm(value);
-
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-
-    timeoutRef.current = setTimeout(() => {
-      searchBooksInFirestore(value);
-    }, 500);
+    setInputValue(e.target.value);
+    if (e.target.value.trim() === "") {
+      if (context?.setSearchTerm) context.setSearchTerm("");
+    }
   };
-  return (
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && context?.setSearchTerm) {
+      context.setSearchTerm(inputValue.trim());
+    }
+    if (e.key === 'Escape') {
+      setInputValue("");
+      if (context?.setSearchTerm) {
+        context.setSearchTerm("");
+      }
+      inputRef.current?.blur(); 
+    }
+  };
+
+  return (
     <label className="input flex items-center w-full md:w-2/4">
       <svg className="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
         <g
@@ -38,14 +53,15 @@ export const SearchBooks = () => {
         </g>
       </svg>
       <input
-        // ref={inputRef}
+        ref={inputRef} 
         type="search"
         className="grow"
         placeholder="کتاب یا مصنف سرچ کریں۔۔۔"
         onFocus={(e) => (e.target.placeholder = "اردو کی بورڈ منتخب کریں۔۔۔")}
         onBlur={(e) => (e.target.placeholder = "کتاب یا مصنف سرچ کریں۔۔۔")}
         onChange={handleInputChange}
-        value={searchTerm} // ان پٹ کو اسٹیٹ کے ساتھ جوڑیں
+        onKeyDown={handleKeyDown}
+        value={inputValue}
       />
       <kbd className="kbd kbd-sm p-3">/</kbd>
     </label>
