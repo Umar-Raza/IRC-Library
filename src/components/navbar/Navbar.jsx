@@ -1,5 +1,5 @@
 import { useAuth } from '@/context/AuthContext';
-import {  LogIn, LogOut, SquareLibrary } from 'lucide-react'
+import { LogIn, LogOut, SquareLibrary } from 'lucide-react'
 import React from 'react'
 import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom'
@@ -18,7 +18,6 @@ export const Navbar = () => {
             toast.error("Logout failed");
         }
     };
-
     return (
         <header className="navbar shadow-sm px-3 sm:px-21 w-full flex items-center justify-between sticky top-0 z-50 bg-base-100">
             <div className="navbar-start">
@@ -30,7 +29,7 @@ export const Navbar = () => {
                         tabIndex="-1"
                         className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
                         <li><Link to="/" className='btn btn-md btn-neutral btn-ghost'>Home</Link></li>
-                        <li><Link to="/" className='btn btn-md btn-neutral btn-ghost'>Social Media </Link></li>
+                        <li><Link to="/IRCLibrary" className='btn btn-md btn-neutral btn-ghost'>IRC Library</Link></li>
                     </ul>
                 </div>
             </div>
@@ -51,7 +50,12 @@ export const Navbar = () => {
                         <div className="hidden md:flex flex-col items-end">
                             {/* <span className="text-sm font-bold text-neutral leading-none">Librarian</span> */}
                             <span className="text-xs text-base-content/60">{user.email}</span>
-                            <button className='btn-link cursor-pointer hover:text-neutral' onClick={() => navigate('/librarian-dashboard')}>Librarian Dashboard</button>
+                            {user.email === "almadinatulilmia.fsd@dawateislami.net" && (
+                                <button className='btn-link cursor-pointer hover:text-neutral' onClick={() => navigate('/librarian-dashboard')}>Librarian Dashboard</button>
+                            )}
+                            {user.email !== "almadinatulilmia.fsd@dawateislami.net" && (
+                                <button className='btn-link cursor-pointer hover:text-neutral' onClick={() => navigate('/IRCLibrary')}>IRC Library</button>
+                            )}
                         </div>
 
                         <button
@@ -64,7 +68,7 @@ export const Navbar = () => {
                     </div>
                 ) : (
                     <Link
-                        to="/librarian-login"
+                        to="/login"
                         className="btn btn-neutral btn-dash btn-outline btn-sm sm:btn-md gap-2  transition-all"
                     >
                         <span className="hidden sm:inline">Login</span>

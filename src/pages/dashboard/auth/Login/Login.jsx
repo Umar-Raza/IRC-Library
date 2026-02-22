@@ -6,40 +6,47 @@ import { signInWithEmailAndPassword } from 'firebase/auth'
 import toast from 'react-hot-toast'
 import { useAuth } from '@/context/AuthContext'
 
-export const LibrarianLogin = () => {
+export const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { user, isLibrarian } = useAuth();
 
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
-
-  const { user } = useAuth();
-
+  // پہلے سے logged in ہے تو redirect کریں
   useEffect(() => {
     if (user) {
-      navigate('/librarian-dashboard');
+      if (isLibrarian) {
+        navigate('/librarian-dashboard');
+      } else {
+        navigate('/IRCLibrary');
+      }
     }
-  }, [user, navigate]);
-
+  }, [user, isLibrarian, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, formData.email, formData.password);
+      const result = await signInWithEmailAndPassword(auth, formData.email, formData.password);
       toast.success("Login successful!");
-      navigate('/librarian-dashboard');
+      // email چیک کر کے navigate کریں
+      if (result.user.email === "almadinatulilmia.fsd@dawateislami.net") {
+        navigate('/librarian-dashboard');
+      } else {
+        navigate('/IRCLibrary');
+      }
     } catch (error) {
-      // console.error("Login error:", error);
       toast.error("LOGIN FAILED! Please check your credentials and try again.");
     } finally {
       setLoading(false);
     }
   };
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -91,7 +98,7 @@ export const LibrarianLogin = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
-                  className="input input-bordered required w-full pl-10 pr-10 focus:input-neutral transition-all text-[16px]"
+                  className="input input-bordered w-full pl-10 pr-10 focus:input-neutral transition-all text-[16px]"
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="••••••••"
@@ -100,41 +107,22 @@ export const LibrarianLogin = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center hover:shadow-neutral cursor-pointer transition-colors"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer transition-colors"
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
             </div>
-
-            {/* یاد رکھیں اور پاس ورڈ بھول گئے */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2">
-              <label className="label cursor-pointer gap-3">
-                <input type="checkbox" className="checkbox checkbox-sm checkbox-neutral" />
-                <span className="label-text">Remember me</span>
-              </label>
-              <Link to="#" className="text-sm font-semibold text-primary hover:underline">
-                Forgot password?
-              </Link>
-            </div>
             <div className="pt-4">
               <button
                 type="submit"
                 disabled={loading}
-                className="btn btn-neutral w-full text-lg shadow-lg hover:shadow-neutral/20 transition-all normal-case"
+                className="btn btn-neutral w-full text-lg shadow-lg transition-all normal-case"
               >
-                {loading ? (
-                  <Loader className="w-5 h-5 animate-spin" />
-                ) : "Sign In"}
+                {loading ? <Loader className="w-5 h-5 animate-spin" /> : "Sign In"}
               </button>
             </div>
           </form>
-          <div className="mt-8 text-center">
-            <p className="text-sm text-base-content/60">
-              Not a librarian?
-              <Link to="/" className="text-primary font-bold ml-1 hover:underline">Back to Home</Link>
-            </p>
-          </div>
         </div>
       </div>
     </div>

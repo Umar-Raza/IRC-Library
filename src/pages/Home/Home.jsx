@@ -1,71 +1,73 @@
-import React, { useEffect, useState, useRef } from 'react'
-import { collection, query, orderBy, onSnapshot, getDocs } from 'firebase/firestore'
-import { Loader, SearchIcon, SearchX } from 'lucide-react'
-import { firestore } from '@/config/Firebase';
-import { BooksTable } from '@/components/booksTable/BooksTable';
-import { SearchBooks } from '@/components/searchBooks/SearchBooks';
-import { ChevronDown, } from 'lucide-react';
-import { useBooks } from '@/context/BooksContext';
+import React from 'react'
+// import { collection, query, orderBy, onSnapshot, getDocs } from 'firebase/firestore'
+// import { Loader, SearchIcon, SearchX } from 'lucide-react'
+// import { firestore } from '@/config/Firebase';
+// import { BooksTable } from '@/components/booksTable/BooksTable';
+// import { SearchBooks } from '@/components/searchBooks/SearchBooks';
+// import { ChevronDown, } from 'lucide-react';
+// import { useBooks } from '@/context/BooksContext';
 export const Home = () => {
 
-    const [subjectFilter, setSubjectFilter] = useState('');
-    const [sortOrder, setSortOrder] = useState('ترتیب منتخب کریں');
-    const [readers, setReaders] = useState([]);
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [subjectSearch, setSubjectSearch] = useState("");
-    const dropdownRef = useRef(null);
-    const [isSortOpen, setIsSortOpen] = useState(false);
-    const sortRef = useRef(null);
-    const sortOptions = ["ا → ے", "ے → ا"];
-    const [availableSubjects, setAvailableSubjects] = useState([]);
+    // const [subjectFilter, setSubjectFilter] = useState('');
+    // const [sortOrder, setSortOrder] = useState('ترتیب منتخب کریں');
+    // const [readers, setReaders] = useState([]);
+    // const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    // const [subjectSearch, setSubjectSearch] = useState("");
+    // const dropdownRef = useRef(null);
+    // const [isSortOpen, setIsSortOpen] = useState(false);
+    // const sortRef = useRef(null);
+    // const sortOptions = ["ا → ے", "ے → ا"];
+    // const [availableSubjects, setAvailableSubjects] = useState([]);
 
-    //  Books Context
-    const { books, loading, loadingMore, hasMore, fetchMore, updateStatus, totalBooks, selectedSubject, setSelectedSubject, searchTerm, setSearchTerm, sortBy, setSortBy } = useBooks();
+    // //  Books Context
+    // const { books, loading, loadingMore, hasMore, fetchMore, updateStatus, totalBooks, selectedSubject, setSelectedSubject, searchTerm, setSearchTerm, sortBy, setSortBy } = useBooks();
 
-    useEffect(() => {
-        const handleClickOutside = (e) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-                setIsDropdownOpen(false);
-                setSubjectSearch("");
-            }
-            if (sortRef.current && !sortRef.current.contains(e.target)) {
-                setIsSortOpen(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+    // useEffect(() => {
+    //     const handleClickOutside = (e) => {
+    //         if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+    //             setIsDropdownOpen(false);
+    //             setSubjectSearch("");
+    //         }
+    //         if (sortRef.current && !sortRef.current.contains(e.target)) {
+    //             setIsSortOpen(false);
+    //         }
+    //     };
+    //     document.addEventListener('mousedown', handleClickOutside);
+    //     return () => document.removeEventListener('mousedown', handleClickOutside);
+    // }, []);
 
-    useEffect(() => {
-        const q = query(collection(firestore, 'readers'), orderBy('name', 'asc'));
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setReaders(list);
-        });
-        return () => unsubscribe();
-    }, []);
+    // useEffect(() => {
+    //     const q = query(collection(firestore, 'readers'), orderBy('name', 'asc'));
+    //     const unsubscribe = onSnapshot(q, (snapshot) => {
+    //         const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    //         setReaders(list);
+    //     });
+    //     return () => unsubscribe();
+    // }, []);
 
-    useEffect(() => {
-        const fetchSubjects = async () => {
-            try {
-                const snapshot = await getDocs(collection(firestore, 'books'));
-                const uniqueSubjects = [
-                    ...new Set(snapshot.docs.map(doc => doc.data().subject))
-                ].filter(Boolean).sort();
-                setAvailableSubjects(uniqueSubjects);
-            } catch (error) {
-                console.error("Subjects load error:", error);
-            }
-        };
-        fetchSubjects();
-    }, []);
+    // useEffect(() => {
+    //     const fetchSubjects = async () => {
+    //         try {
+    //             const snapshot = await getDocs(collection(firestore, 'books'));
+    //             const uniqueSubjects = [
+    //                 ...new Set(snapshot.docs.map(doc => doc.data().subject))
+    //             ].filter(Boolean).sort();
+    //             setAvailableSubjects(uniqueSubjects);
+    //         } catch (error) {
+    //             console.error("Subjects load error:", error);
+    //         }
+    //     };
+    //     fetchSubjects();
+    // }, []);
 
-    const filteredSubjects = availableSubjects.filter(s =>
-        s.toLowerCase().includes(subjectSearch.toLowerCase())
-    );
+    // const filteredSubjects = availableSubjects.filter(s =>
+    //     s.toLowerCase().includes(subjectSearch.toLowerCase())
+    // );
     return (
         <div className="card bg-base-100 shadow-xl my-4 w-[98%] zain-light lg:w-[94%] xl:w-[92%] mx-auto border border-base-200 ">
-            <div className="card-body">
+            
+            Home
+            {/* <div className="card-body">
                 <div className="flex flex-wrap items-center justify-center gap-2 py-4 text-sm sm:text-lg text-neutral" dir="rtl">
                     <span>اسلامک ریسرچ سینٹر فیصل آباد میں کل</span>
                     <span className="inline-flex items-center justify-center font-bold bg-neutral text-white px-3 py-0.5 rounded-lg min-w-[2.5rem]">
@@ -221,7 +223,7 @@ export const Home = () => {
                         </button>
                     )}
                 </div>
-            </div>
+            </div> */}
         </div>
     )
 }

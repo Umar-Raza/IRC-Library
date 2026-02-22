@@ -4,29 +4,26 @@ import { auth } from "@/config/Firebase";
 
 const AuthContext = createContext();
 
+const LIBRARIAN_EMAIL = "almadinatulilmia.fsd@dawateislami.net";
+
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            if (currentUser && currentUser.email === "almadinatulilmia.fsd@dawateislami.net") {
-                setUser(currentUser);
-            } else {
-                setUser(null);
-            }
+            setUser(currentUser || null);
             setLoading(false);
         });
-
         return () => unsubscribe();
     }, []);
 
-    const logout = () => {
-        return signOut(auth);
-    };
+    const logout = () => signOut(auth);
+
+    const isLibrarian = user?.email === LIBRARIAN_EMAIL;
 
     return (
-        <AuthContext.Provider value={{ user, loading, logout }}>
+        <AuthContext.Provider value={{ user, loading, logout, isLibrarian }}>
             {!loading && children}
         </AuthContext.Provider>
     );
