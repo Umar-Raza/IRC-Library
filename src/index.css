@@ -49,7 +49,6 @@ body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  /* اسکرول بار کو مکمل ختم کرنے کے لیے */
   overflow: hidden;
   height: 100%;
 }
@@ -57,15 +56,14 @@ body {
 #root {
   display: flex;
   flex-direction: column;
-  height: 100dvh; /* min-height کے بجائے فکسڈ height دیں */
+  height: 100dvh;
 }
 
-/* اگر مواد زیادہ ہو تو صرف main کے اندر اسکرول آئے */
 main {
   flex: 1;
   overflow-y: auto;
   -ms-overflow-style: none;
-  scrollbar-width: none; 
+  scrollbar-width: none;
 }
 
 main::-webkit-scrollbar {

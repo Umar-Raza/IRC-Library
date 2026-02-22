@@ -1,229 +1,156 @@
-import React from 'react'
-// import { collection, query, orderBy, onSnapshot, getDocs } from 'firebase/firestore'
-// import { Loader, SearchIcon, SearchX } from 'lucide-react'
-// import { firestore } from '@/config/Firebase';
-// import { BooksTable } from '@/components/booksTable/BooksTable';
-// import { SearchBooks } from '@/components/searchBooks/SearchBooks';
-// import { ChevronDown, } from 'lucide-react';
-// import { useBooks } from '@/context/BooksContext';
+import React, { useEffect, useState, useContext } from 'react'
+import { Link } from 'react-router-dom'
+import { BookOpen, Search, ShieldCheck } from 'lucide-react'
+import { useBooks } from '../../context/BooksContext'
+
 export const Home = () => {
+    const { totalBooks } = useBooks()
+    const [visible, setVisible] = useState(false)
 
-    // const [subjectFilter, setSubjectFilter] = useState('');
-    // const [sortOrder, setSortOrder] = useState('ترتیب منتخب کریں');
-    // const [readers, setReaders] = useState([]);
-    // const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    // const [subjectSearch, setSubjectSearch] = useState("");
-    // const dropdownRef = useRef(null);
-    // const [isSortOpen, setIsSortOpen] = useState(false);
-    // const sortRef = useRef(null);
-    // const sortOptions = ["ا → ے", "ے → ا"];
-    // const [availableSubjects, setAvailableSubjects] = useState([]);
+    useEffect(() => {
+        const t = setTimeout(() => setVisible(true), 100)
+        return () => clearTimeout(t)
+    }, [])
 
-    // //  Books Context
-    // const { books, loading, loadingMore, hasMore, fetchMore, updateStatus, totalBooks, selectedSubject, setSelectedSubject, searchTerm, setSearchTerm, sortBy, setSortBy } = useBooks();
+    const stats = [
+        { number: totalBooks > 0 ? `${totalBooks}+` : "5000+", label: "Volumes" },
+        { number: "100+", label: "Subjects" },
+        { number: "24/7", label: "Access" },
+    ]
 
-    // useEffect(() => {
-    //     const handleClickOutside = (e) => {
-    //         if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-    //             setIsDropdownOpen(false);
-    //             setSubjectSearch("");
-    //         }
-    //         if (sortRef.current && !sortRef.current.contains(e.target)) {
-    //             setIsSortOpen(false);
-    //         }
-    //     };
-    //     document.addEventListener('mousedown', handleClickOutside);
-    //     return () => document.removeEventListener('mousedown', handleClickOutside);
-    // }, []);
-
-    // useEffect(() => {
-    //     const q = query(collection(firestore, 'readers'), orderBy('name', 'asc'));
-    //     const unsubscribe = onSnapshot(q, (snapshot) => {
-    //         const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    //         setReaders(list);
-    //     });
-    //     return () => unsubscribe();
-    // }, []);
-
-    // useEffect(() => {
-    //     const fetchSubjects = async () => {
-    //         try {
-    //             const snapshot = await getDocs(collection(firestore, 'books'));
-    //             const uniqueSubjects = [
-    //                 ...new Set(snapshot.docs.map(doc => doc.data().subject))
-    //             ].filter(Boolean).sort();
-    //             setAvailableSubjects(uniqueSubjects);
-    //         } catch (error) {
-    //             console.error("Subjects load error:", error);
-    //         }
-    //     };
-    //     fetchSubjects();
-    // }, []);
-
-    // const filteredSubjects = availableSubjects.filter(s =>
-    //     s.toLowerCase().includes(subjectSearch.toLowerCase())
-    // );
     return (
-        <div className="card bg-base-100 shadow-xl my-4 w-[98%] zain-light lg:w-[94%] xl:w-[92%] mx-auto border border-base-200 ">
-            
-            Home
-            {/* <div className="card-body">
-                <div className="flex flex-wrap items-center justify-center gap-2 py-4 text-sm sm:text-lg text-neutral" dir="rtl">
-                    <span>اسلامک ریسرچ سینٹر فیصل آباد میں کل</span>
-                    <span className="inline-flex items-center justify-center font-bold bg-neutral text-white px-3 py-0.5 rounded-lg min-w-[2.5rem]">
-                        {totalBooks === 0 ? (
-                            <Loader className="w-4 h-4 animate-spin" />
-                        ) : (
-                            totalBooks
-                        )}
-                    </span>
-                    <span>مجلدات موجود ہیں۔</span>
-                </div>
-                <div className="bg-base-100 rounded-xl shadow  border border-base-300 p-4 mb-2" dir="rtl">
-                    <div className="flex flex-col md:flex-row items-stretch gap-3">
-                        <div className="flex-1 lg:flex-2 min-w-0">
-                            <SearchBooks onSearch={(value) => {
-                                setSearchTerm(value);
-                            }} />
-                        </div>
+        <>
+            {/* Google Fonts */}
+            <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
 
-                        <div className="relative w-full md:w-1/4 text-[16px]" ref={dropdownRef} dir="rtl">
-                            <div
-                                className="input input-bordered flex items-center text-base-content/60 justify-between cursor-pointer"
-                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                            >
-                                <span className="truncate">{selectedSubject === "All" || !selectedSubject ? "تمام مضامین" : selectedSubject}</span>
-                                <ChevronDown size={18} className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+            <section className="relative overflow-hidden min-h-screen flex items-center">
+
+                {/* Background */}
+                <div className="absolute inset-0 bg-base-100">
+                    <svg className="absolute inset-0 w-full h-full opacity-[0.035]" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <pattern id="islamic" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
+                                <polygon points="40,0 80,20 80,60 40,80 0,60 0,20" fill="none" stroke="currentColor" strokeWidth="1" />
+                                <polygon points="40,15 65,27 65,53 40,65 15,53 15,27" fill="none" stroke="currentColor" strokeWidth="0.5" />
+                                <circle cx="40" cy="40" r="8" fill="none" stroke="currentColor" strokeWidth="0.5" />
+                            </pattern>
+                        </defs>
+                        <rect width="100%" height="100%" fill="url(#islamic)" className="text-neutral" />
+                    </svg>
+                    <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-base-200/50 to-transparent" />
+                    <div className="absolute bottom-0 left-0 w-96 h-96 rounded-full bg-neutral/5 blur-3xl" />
+                </div>
+
+                {/* Main Content */}
+                <div className="relative z-10 w-[98%] lg:w-[94%] xl:w-[92%] mx-auto px-4 py-12 sm:py-20 lg:py-24">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+
+                        {/* Left — Text */}
+                        <div className={`space-y-8 transition-all duration-1000 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+
+                            {/* Members Only Badge */}
+                            <div className="inline-flex items-center gap-2 border border-neutral/30 text-neutral/70 px-4 py-1.5 rounded-full text-xs tracking-widest uppercase" style={{ fontFamily: "'Lato', sans-serif", letterSpacing: '0.2em' }}>
+                                <ShieldCheck size={13} />
+                                Members Only · IRC Faisalabad
                             </div>
 
-                            {isDropdownOpen && (
-                                <div className="absolute z-50 w-full mt-1 bg-base-100 border border-base-300 rounded-lg shadow-xl overflow-hidden">
-                                    <div className="p-2 border-b border-base-200 bg-base-200/50">
-                                        <div className="relative">
-                                            <SearchIcon className="absolute right-2 top-2.5 text-base-content/50 z-10" size={16} />
-                                            <input
-                                                type="text"
-                                                className="input input-sm input-bordered w-full pr-8"
-                                                placeholder="مضمون تلاش کریں..."
-                                                value={subjectSearch}
-                                                onChange={(e) => setSubjectSearch(e.target.value)}
-                                                autoFocus
-                                            />
+                            {/* Heading */}
+                            <div className="space-y-2">
+                                <p className="text-neutral/40 text-sm tracking-[0.3em] uppercase" style={{ fontFamily: "'Lato', sans-serif" }}>
+                                    Islamic Research Center
+                                </p>
+                                <h1 style={{ fontFamily: "'Playfair Display', serif" }} className="text-5xl sm:text-6xl lg:text-[5.5rem] font-black text-neutral leading-[1.05] tracking-tight">
+                                    Where Scholars
+                                    <span className="block italic font-bold text-neutral/70">
+                                        Find Their Way
+                                    </span>
+                                </h1>
+                            </div>
+
+                            {/* Divider */}
+                            <div className="flex items-center gap-4">
+                                <div className="h-px w-12 bg-neutral/40" />
+                                <p className="text-base-content/55 text-lg leading-relaxed max-w-md" style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300 }}>
+                                    An exclusive digital archive of Islamic manuscripts, scholarly texts, and research volumes — curated for the members of IRC.
+                                </p>
+                            </div>
+
+                            {/* Buttons */}
+                            <div className={`flex flex-wrap gap-4 transition-all duration-1000 delay-300 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                                <Link
+                                    to="/IRCLibrary"
+                                    className="btn btn-neutral btn-lg gap-2 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 rounded-xl"
+                                    style={{ fontFamily: "'Lato', sans-serif", letterSpacing: '0.05em' }}
+                                >
+                                    <BookOpen size={18} />
+                                    Enter Library
+                                </Link>
+                                <Link
+                                    to="/IRCLibrary"
+                                    className="btn btn-outline btn-neutral btn-lg gap-2 hover:-translate-y-0.5 transition-all duration-200 rounded-xl"
+                                    style={{ fontFamily: "'Lato', sans-serif", letterSpacing: '0.05em' }}
+                                >
+                                    <Search size={18} />
+                                    Search Archive
+                                </Link>
+                            </div>
+
+                            {/* Stats */}
+                            <div className={`flex flex-wrap gap-10 pt-2 transition-all duration-1000 delay-500 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                                {stats.map((stat, i) => (
+                                    <div key={i}>
+                                        <div className="text-3xl font-black text-neutral" style={{ fontFamily: "'Playfair Display', serif" }}>{stat.number}</div>
+                                        <div className="text-xs text-base-content/40 tracking-widest uppercase mt-1" style={{ fontFamily: "'Lato', sans-serif" }}>{stat.label}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Right — Decorative */}
+                        <div className={`hidden lg:flex justify-center items-center transition-all duration-1000 delay-200 ${visible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'}`}>
+                            <div className="relative">
+                                <div className="w-80 h-80 rounded-full border border-neutral/15 flex items-center justify-center">
+                                    <div className="w-60 h-60 rounded-full border border-neutral/10 flex items-center justify-center bg-neutral/5">
+                                        <div className="w-40 h-40 rounded-full bg-neutral flex items-center justify-center shadow-2xl">
+                                            <BookOpen className="w-16 h-16 text-white" strokeWidth={1.2} />
                                         </div>
                                     </div>
-                                    <ul className="max-h-60 overflow-y-auto p-1 z-999">
-                                        <li
-                                            className={`p-2 hover:bg-neutral hover:text-white rounded cursor-pointer ${selectedSubject === "All" ? 'bg-neutral text-white' : ''}`}
-                                            onClick={() => {
-                                                setSelectedSubject("All");
-                                                setIsDropdownOpen(false);
-                                                setSubjectSearch("");
-                                            }}
-                                        >
-                                            تمام مضامین
-                                        </li>
-                                        {filteredSubjects.length === 0 && subjectSearch !== "" ? (
-                                            <li className="p-3 text-center text-base-content/50 text-sm">
-                                                معذرت! <span className="font-bold text-neutral">"{subjectSearch}"</span> کا مضمون نہیں ملا۔
-                                            </li>
-                                        ) : (
-                                            filteredSubjects.map((subject) => (
-                                                <li
-                                                    key={subject}
-                                                    className={`p-2 hover:bg-neutral hover:text-white rounded cursor-pointer mt-1 ${selectedSubject === subject ? 'bg-neutral text-white' : ''}`}
-                                                    onClick={() => {
-                                                        setSelectedSubject(subject);
-                                                        setIsDropdownOpen(false);
-                                                        setSubjectSearch("");
-                                                    }}
-                                                >
-                                                    {subject}
-                                                </li>
-                                            ))
-                                        )}
-                                    </ul>
                                 </div>
-                            )}
-                        </div>
 
-                        <div className="relative w-full md:w-1/4 text-[16px]" ref={sortRef} dir="rtl">
-                            <div
-                                className="input input-bordered flex items-center justify-between cursor-pointer bg-base-100 pr-4 pl-3"
-                                onClick={() => setIsSortOpen(!isSortOpen)}
-                            >
-                                <span className="truncate text-base-content/60 ">
-                                    {sortOrder || "ترتیب منتخب کریں"}
-                                </span>
-                                <ChevronDown
-                                    size={18}
-                                    className={`text-base-content/50 transition-transform duration-300 ${isSortOpen ? 'rotate-180' : ''}`}
-                                />
+                                {/* Rotating arabic text */}
+                                <svg className="absolute inset-0 w-80 h-80 animate-spin" style={{ animationDuration: '25s' }} viewBox="0 0 320 320">
+                                    <defs>
+                                        <path id="circle" d="M 160,160 m -130,0 a 130,130 0 1,1 260,0 a 130,130 0 1,1 -260,0" />
+                                    </defs>
+                                    <text fill="currentColor" className="text-neutral/30" fontSize="12" letterSpacing="5">
+                                        <textPath href="#circle">
+                                            اقرأ باسم ربك الذي خلق • اقرأ باسم ربك الذي خلق •
+                                        </textPath>
+                                    </text>
+                                </svg>
+
+                                {/* Subject badges */}
+                                <div className="absolute -top-6 -right-2 bg-base-100 border border-base-300 rounded-2xl px-4 py-2 shadow-lg text-sm text-neutral font-medium animate-bounce" style={{ animationDuration: '3s', fontFamily: "'Lato', sans-serif" }}>
+                                    📚 فقہ
+                                </div>
+                                <div className="absolute -bottom-6 -left-2 bg-base-100 border border-base-300 rounded-2xl px-4 py-2 shadow-lg text-sm text-neutral font-medium animate-bounce" style={{ animationDuration: '4s', animationDelay: '1s', fontFamily: "'Lato', sans-serif" }}>
+                                    📖 تفسیر
+                                </div>
+                                <div className="absolute top-1/2 -right-16 bg-base-100 border border-base-300 rounded-2xl px-4 py-2 shadow-lg text-sm text-neutral font-medium animate-bounce" style={{ animationDuration: '3.5s', animationDelay: '0.5s', fontFamily: "'Lato', sans-serif" }}>
+                                    ✨ حدیث
+                                </div>
                             </div>
-
-                            {isSortOpen && (
-                                <div className="absolute z-100 w-full mt-1 bg-base-100  border border-base-300 rounded-lg shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200">
-                                    <ul className="p-1">
-                                        {sortOptions.map((option) => (
-                                            <li
-                                                key={option}
-                                                className={`p-2.5 hover:bg-neutral hover:text-white rounded-lg cursor-pointer transition-colors text-sm mt-1 ${sortOrder === option ? 'bg-neutral text-white' : 'hover:bg-base-200'}`}
-                                                onClick={() => {
-                                                    setSortOrder(option);
-                                                    if (option === "ا → ے") setSortBy('a-z');
-                                                    else setSortBy('newest');
-                                                    setIsSortOpen(false);
-                                                }}
-                                            >
-                                                {option}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
                         </div>
                     </div>
                 </div>
-                <div className="relative">
-                    {!loading && books.length === 0 ? (
-                        <div className="py-20 text-center bg-base-200/20 rounded-xl border border-dashed border-base-300">
-                            <SearchX size={64} className="mx-auto mb-4 text-base-content/20" />
-                            <h3 className="text-3xl font-bold text-base-content/50 noto-naskh-arabic-font">
-                                معذرت! کوئی کتاب نہیں ملی۔
-                            </h3>
-                            <p className="text-xl mt-2 text-base-content/40">
-                                {searchTerm
-                                    ? `آپ کی تلاش "${searchTerm}" کے مطابق کوئی نتیجہ نہیں ملا۔`
-                                    : "اس مضمون میں فی الحال کوئی کتاب دستیاب نہیں ہے۔"}
-                            </p>
-                        </div>
-                    ) : (
-                        <BooksTable
-                            books={books}
-                            loading={loading}
-                            isAdmin={false}
-                            readers={readers}
-                            updateStatus={updateStatus}
-                            searchTerm={searchTerm}
-                        />
-                    )}
+
+                {/* Bottom wave */}
+                <div className="absolute bottom-0 left-0 right-0 leading-none">
+                    <svg viewBox="0 0 1440 80" className="w-full block fill-base-200">
+                        <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" />
+                    </svg>
                 </div>
-                <div className="flex justify-center my-3">
-                    {hasMore && books.length > 0 && (
-                        <button
-                            onClick={() => fetchMore(false)}
-                            className="btn btn-neutral px-10"
-                            disabled={loading || loadingMore}
-                        >
-                            {loadingMore ? (
-                                <>
-                                    <Loader className="w-5 h-5 animate-spin mx-2" />
-                                    <span>لوڈ ہو رہا ہے</span>
-                                </>
-                            ) : 'مزید کتابیں دیکھیں'}
-                        </button>
-                    )}
-                </div>
-            </div> */}
-        </div>
+            </section>
+        </>
     )
 }

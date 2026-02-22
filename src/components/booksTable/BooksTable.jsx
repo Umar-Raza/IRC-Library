@@ -120,8 +120,10 @@ export const BooksTable = ({ books, readers, handleEditBook, loading, isAdmin = 
                         disabled={updatingBookId === book.id}
                         onChange={(e) => updateStatus(book.id, e.target.value)}
                       >
-                        {!isAdmin && <option value="library">اسٹیٹس</option>}
-                        {isAdmin && <option value="library">لائبریری</option>}
+                        {/* {!isAdmin && <option value="library">اسٹیٹس</option>}
+                        {isAdmin && <option value="library">لائبریری</option>} */}
+
+                        <option value="library">لائبریری</option>
                         {readers.map((reader) => (
                           <option key={reader.id} value={reader.name}>{reader.name}</option>
                         ))}
