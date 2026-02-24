@@ -12,12 +12,10 @@ export const DeleteBook = ({ bookId }) => {
         if (window.confirm("کیا آپ واقعی یہ کتاب ڈیلیٹ کرنا چاہتے ہیں؟")) {
             try {
                 await deleteDoc(doc(firestore, 'books', bookId));
-
                 setBooks(prevBooks => prevBooks.filter(book => book.id !== bookId));
-
-                toast.success("کتاب کامیابی سے ڈیلیٹ کر دی گئی ہے");
+                toast.success("Book deleted successfully!");
             } catch (err) {
-                console.error("Error deleting book:", err);
+                // console.error("Error deleting book:", err);
                 toast.error("کتاب ڈیلیٹ کرنے میں ناکامی ہوئی");
             }
         }

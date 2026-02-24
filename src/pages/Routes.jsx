@@ -1,5 +1,5 @@
 import React from 'react'
-import { Route, Routes } from 'react-router-dom'
+import { Route, Router, Routes } from 'react-router-dom'
 import { Home } from './Home/Home.jsx'
 // import { Login } from './dashboard/auth/Login/Login.jsx'
 import { LibrarianDashboard } from './dashboard/librarianDasboard/LibrarianDashboard.jsx'
@@ -14,6 +14,8 @@ import { BookProvider } from '@/context/BooksContext.jsx'
 import { IRCLibrary } from './ircLibrary/IRCLibrary.jsx'
 import { ProtectedRouteForReader } from './dashboard/auth/ProtectedRoute.jsx'
 import { Login } from './dashboard/auth/Login/Login.jsx'
+import { ReaderRegister } from './dashboard/auth/readerRigister/ReaderRegister.jsx'
+import { PendingApproval } from './dashboard/auth/readerRigister/PendingApproval.jsx'
 const index = () => {
     return (
         <AuthProvider>
@@ -22,6 +24,8 @@ const index = () => {
                 <main className='flex-1 flex flex-col'>
                     <Routes>
                         <Route path='/' element={<Home />} />
+                        <Route path='/readerRegister' element={<ReaderRegister />} />
+                        <Route path='/pending' element={<PendingApproval />} />
                         <Route path='/login' element={
                             <PublicRouteForLibrarian>
                                 <Login />

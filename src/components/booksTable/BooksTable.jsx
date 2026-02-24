@@ -1,12 +1,14 @@
 import React from 'react'
-import { Book, BookAIcon, BookOpen, BookOpenText, Download, EllipsisVertical, Loader, Loader2, SquarePen } from 'lucide-react'
+import { Book, Download, EllipsisVertical, Loader, SquarePen } from 'lucide-react'
 import { DeleteBook } from '@/pages/dashboard/librarianDasboard/DeleteBook';
 import { toast } from 'react-hot-toast';
 import { useBooks } from '@/context/BooksContext';
+import { useAuth } from '@/context/AuthContext';
 
-export const BooksTable = ({ books, readers, handleEditBook, loading, isAdmin = false }) => {
+export const BooksTable = ({ books, handleEditBook,  updateStatus, loading, isAdmin = false }) => {
 
-  const { updateStatus, updatingBookId } = useBooks();
+  const { readerName, isLibrarian } = useAuth();
+  const { updatingBookId } = useBooks();
 
   const SkeletonRow = () => (
     <tr className="animate-pulse">
@@ -26,6 +28,8 @@ export const BooksTable = ({ books, readers, handleEditBook, loading, isAdmin = 
       {isAdmin && <td><div className="h-8 w-8 bg-base-300 rounded mx-auto"></div></td>}
     </tr>
   );
+
+
   return (
     <>
       <div className="relative overflow-x-auto max-h-[70vh]" dir="rtl">
@@ -114,35 +118,86 @@ export const BooksTable = ({ books, readers, handleEditBook, loading, isAdmin = 
                   </td>
                   <td className="py-4 text-center whitespace-nowrap">
                     <div className="relative flex items-center justify-center w-full min-w-32 h-10">
-                      <select
-                        className={`select select-sm w-full font-sans ${book.status === 'library' ? 'select-success' : 'select-error'} ${updatingBookId === book.id ? 'opacity-70' : ''}`}
-                        value={book.status}
-                        disabled={updatingBookId === book.id}
-                        onChange={(e) => updateStatus(book.id, e.target.value)}
-                      >
-                        {/* {!isAdmin && <option value="library">اسٹیٹس</option>}
-                        {isAdmin && <option value="library">لائبریری</option>} */}
 
-                        <option value="library">لائبریری</option>
-                        {readers.map((reader) => (
-                          <option key={reader.id} value={reader.name}>{reader.name}</option>
-                        ))}
-                      </select>
+                      {/* Reader */}
+                      {!isLibrarian && readerName && (() => {
+                        const isIssuedToMe = book.status === readerName;
+                        const isAvailable = book.status === 'library';
+                        const issuedToOther = !isAvailable && !isIssuedToMe;
 
-                      {updatingBookId === book.id && (
-                        <div className='absolute inset-0 flex items-center justify-center pointer-events-none'>
-                          <Loader className="animate-spin text-neutral" size={20} />
-                        </div>
-                      )}
+                        // Display current holder if issued user
+                        if (isIssuedToMe) {
+                          return (
+                            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold bg-emerald-100 text-emerald-700 border border-emerald-300 shadow-sm select-none">
+                              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse inline-block"></span>
+                              {readerName}
+                            </span>
+                          );
+                        }
+
+                        // Borrow available book — active button
+                        if (isAvailable) {
+                          const isUpdating = updatingBookId === book.id;
+                          return (
+                            <button
+                              onClick={() => !isUpdating && updateStatus(book.id, readerName)}
+                              disabled={isUpdating}
+                              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold bg-neutral text-white border border-neutral shadow-sm hover:opacity-80 transition-opacity cursor-pointer disabled:opacity-60"
+                            >
+                              {isUpdating ? <Loader className="w-5 h-4 animate-spin" /> : 'Borrow'}
+                            </button>
+                          );
+                        }
+
+                        // Book transfer to another reader — Show current holder and allow transfer
+                        if (issuedToOther) {
+                          const isUpdating = updatingBookId === book.id;
+                          return (
+                            <button
+                              onClick={() => !isUpdating && updateStatus(book.id, readerName)}
+                              disabled={isUpdating}
+                              title={`Click to borrow from ${book.status} to you`}
+                              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold bg-amber-50 text-amber-700 border border-amber-300 shadow-sm hover:bg-amber-100 hover:border-amber-400 transition-all cursor-pointer disabled:opacity-60"
+                            >
+                              {isUpdating ? <Loader className="w-5 h-4 animate-spin text-amber-700" /> : book.status}
+                            </button>
+                          );
+                        }
+                      })()}
+
+                      {/* For Librarian  */}
+                      {isLibrarian && (() => {
+                        const isAvailable = book.status === 'library';
+                        const isUpdating = updatingBookId === book.id;
+
+                        if (isAvailable) {
+                          return (
+                            <span className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full text-sm font-bold bg-emerald-100 text-emerald-700 border border-emerald-300 shadow-sm select-none">
+                              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse inline-block"></span>
+                              Available
+                            </span>
+                          );
+                        }
+                        return (
+                          <button
+                            onClick={() => !isUpdating && updateStatus(book.id, 'library')}
+                            disabled={isUpdating}
+                            title="Return to library"
+                            className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold bg-amber-50 text-amber-700 border border-amber-300 shadow-sm hover:bg-red-50 hover:text-red-600 hover:border-red-300 transition-all cursor-pointer disabled:opacity-60"
+                          >
+                            {isUpdating ? <Loader className="w-5 h-4 animate-spin" /> : book.status}
+                          </button>
+                        );
+                      })()}
                     </div>
                   </td>
                   {isAdmin && (
                     <td className="pt-6 text-center">
                       <div className="dropdown dropdown-left">
-                        <button className="btn btn-ghost btn-sm"><EllipsisVertical /></button>
-                        <ul className="dropdown-content menu shadow bg-base-100 rounded-box w-20">
+                        <button tabIndex={0} className="btn btn-ghost btn-sm"><EllipsisVertical /></button>
+                        <ul tabIndex={0} className="dropdown-content menu shadow bg-base-100 rounded-box w-20 z-50">
                           <li>
-                            <button className='btn btn-neutral' onClick={() => handleEditBook(book)}>
+                            <button className='btn btn-neutral btn-sm' onClick={() => handleEditBook(book)}>
                               <SquarePen size={14} />
                             </button>
                           </li>

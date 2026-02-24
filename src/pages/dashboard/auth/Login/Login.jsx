@@ -17,7 +17,7 @@ export const Login = () => {
     password: "",
   });
 
-  // پہلے سے logged in ہے تو redirect کریں
+  // Redirect based on user role after login
   useEffect(() => {
     if (user) {
       if (isLibrarian) {
@@ -34,7 +34,7 @@ export const Login = () => {
     try {
       const result = await signInWithEmailAndPassword(auth, formData.email, formData.password);
       toast.success("Login successful!");
-      // email چیک کر کے navigate کریں
+      // Check if the logged-in user is the librarian
       if (result.user.email === "almadinatulilmia.fsd@dawateislami.net") {
         navigate('/librarian-dashboard');
       } else {
@@ -123,6 +123,14 @@ export const Login = () => {
               </button>
             </div>
           </form>
+          <div className="pt-4 text-center">
+            <span className="text-sm text-base-content/70">Don't have an account?</span>
+            <Link to="/readerRegister">
+              <div className="text-neutral font-bold hover:underline cursor-pointer transition-colors inline-block ml-2">
+                Register here
+              </div>
+            </Link>
+          </div>
         </div>
       </div>
     </div>

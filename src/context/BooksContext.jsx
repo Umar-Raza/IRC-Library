@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { collection, query, orderBy, limit, startAfter, getDocs, doc, updateDoc, where, getCountFromServer } from 'firebase/firestore';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { collection, query, orderBy, limit, startAfter, getDocs, doc, updateDoc, where, getCountFromServer, addDoc, writeBatch, onSnapshot } from 'firebase/firestore';
 import { firestore } from '@/config/Firebase';
 import toast from 'react-hot-toast';
 
@@ -15,8 +15,10 @@ export const BookProvider = ({ children }) => {
     const [selectedSubject, setSelectedSubject] = useState('All');
     const [sortBy, setSortBy] = useState('newest');
     const [searchTerm, setSearchTerm] = useState("");
-    const [totalBooks, setTotalBooks] = useState(0); 
+    const [totalBooks, setTotalBooks] = useState(0);
 
+    // To track loaded book IDs for real-time updates
+    const loadedBookIds = useRef(new Set());
     useEffect(() => {
         const fetchTotalCount = async () => {
             try {
@@ -29,11 +31,42 @@ export const BookProvider = ({ children }) => {
         fetchTotalCount();
     }, []);
 
+    //  Real-time status listener —  status field watch
+    useEffect(() => {
+        if (loadedBookIds.current.size === 0) return;
+
+        const idsArray = Array.from(loadedBookIds.current);
+
+        // Firestore 'in' query max 30 items support
+        const chunks = [];
+        for (let i = 0; i < idsArray.length; i += 30) {
+            chunks.push(idsArray.slice(i, i + 30));
+        }
+
+        const unsubscribers = chunks.map(chunk => {
+            const q = query(
+                collection(firestore, 'books'),
+                where('__name__', 'in', chunk)
+            );
+            return onSnapshot(q, (snapshot) => {
+                snapshot.docChanges().forEach(change => {
+                    if (change.type === 'modified') {
+                        const updated = { id: change.doc.id, ...change.doc.data() };
+                        setBooks(prev => prev.map(b => b.id === updated.id ? { ...b, status: updated.status, reader: updated.reader } : b));
+                    }
+                });
+            });
+        });
+
+        return () => unsubscribers.forEach(u => u());
+    }, [books.length]);
+
     const fetchBooks = async (isFirstLoad = true) => {
         if (isFirstLoad) {
             setLoading(true);
             setBooks([]);
             setLastDoc(null);
+            loadedBookIds.current.clear();
         } else {
             setLoadingMore(true);
         }
@@ -67,6 +100,9 @@ export const BookProvider = ({ children }) => {
             const snapshot = await getDocs(q);
             const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
+            // IDs track 
+            list.forEach(b => loadedBookIds.current.add(b.id));
+
             setBooks(prev => {
                 const combined = isFirstLoad ? list : [...prev, ...list];
                 const uniqueMap = new Map(combined.map(item => [item.id, item]));
@@ -95,11 +131,38 @@ export const BookProvider = ({ children }) => {
                 updatedAt: new Date()
             };
             await updateDoc(bookRef, updateData);
+
+            // UI update
             setBooks(prev => prev.map(b => b.id === bookId ? { ...b, ...updateData } : b));
+            setUpdatingBookId(null);
+
+            //  Log system
+            if (newStatus === 'library') {
+                try {
+                    const logsRef = collection(firestore, 'bookLogs');
+                    const logsQuery = query(logsRef, where('bookId', '==', bookId));
+                    const logsSnap = await getDocs(logsQuery);
+                    const batch = writeBatch(firestore);
+                    logsSnap.docs.forEach(d => batch.delete(d.ref));
+                    await batch.commit();
+                } catch (logError) {
+                    console.error('Log reset error:', logError);
+                }
+            } else {
+                try {
+                    await addDoc(collection(firestore, 'bookLogs'), {
+                        bookId: bookId,
+                        readerName: newStatus,
+                        takenAt: new Date(),
+                    });
+                } catch (logError) {
+                    console.error('Log add error:', logError);
+                }
+            }
+
             toast.success(`Status updated to: ${newStatus}`);
         } catch (error) {
             toast.error("اسٹیٹس اپڈیٹ ہونے میں ایرر آرہا ہے!");
-        } finally {
             setUpdatingBookId(null);
         }
     };
@@ -111,7 +174,7 @@ export const BookProvider = ({ children }) => {
     return (
         <BookContext.Provider value={{
             books, loading, loadingMore, hasMore,
-            updateStatus, totalBooks, 
+            updateStatus, totalBooks,
             fetchMore: fetchBooks, updatingBookId, setBooks, searchTerm, setSearchTerm, selectedSubject, setSelectedSubject, sortBy, setSortBy
         }}>
             {children}

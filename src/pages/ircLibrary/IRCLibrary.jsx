@@ -66,7 +66,7 @@ export const IRCLibrary = () => {
   return (
     <div className="card bg-base-100 shadow-xl my-4 w-[98%] zain-light lg:w-[94%] xl:w-[92%] mx-auto border border-base-200 ">
       <div className="card-body">
-        <div className="flex flex-wrap items-center justify-center gap-2 py-4 text-sm sm:text-lg text-neutral" dir="rtl">
+        {/* <div className="flex flex-wrap items-center justify-center gap-2 py-4 text-sm sm:text-lg text-neutral" dir="rtl">
           <span>اسلامک ریسرچ سینٹر فیصل آباد میں کل</span>
           <span className="inline-flex items-center justify-center font-bold bg-neutral text-white px-3 py-0.5 rounded-lg min-w-[2.5rem]">
             {totalBooks === 0 ? (
@@ -76,7 +76,7 @@ export const IRCLibrary = () => {
             )}
           </span>
           <span>مجلدات موجود ہیں۔</span>
-        </div>
+        </div> */}
         <div className="bg-base-100 rounded-xl shadow  border border-base-300 p-4 mb-2" dir="rtl">
           <div className="flex flex-col md:flex-row items-stretch gap-3">
             <div className="flex-1 lg:flex-2 min-w-0">
@@ -215,7 +215,7 @@ export const IRCLibrary = () => {
               {loadingMore ? (
                 <>
                   <Loader className="w-5 h-5 animate-spin mx-2" />
-                  <span>لوڈ ہو رہا ہے</span>
+                  <span>انتظار فرمائیں</span>
                 </>
               ) : 'مزید کتابیں دیکھیں'}
             </button>
