@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react'
 import { Link } from 'react-router-dom'
 import { BookOpen, Search, ShieldCheck } from 'lucide-react'
 import { useBooks } from '../../context/BooksContext'
+import { Contact } from '../contact/Contact'
 
 export const Home = () => {
     const { totalBooks, totalSubjects, totalAuthors } = useBooks()
@@ -143,14 +144,15 @@ export const Home = () => {
                         </div>
                     </div>
                 </div>
-
                 {/* Bottom wave */}
                 <div className="absolute bottom-0 left-0 right-0 leading-none">
                     <svg viewBox="0 0 1440 80" className="w-full block fill-base-200">
                         <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" />
                     </svg>
                 </div>
+
             </section>
+            <Contact />
         </>
     )
 }
