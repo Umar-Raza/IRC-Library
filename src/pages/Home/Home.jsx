@@ -4,7 +4,7 @@ import { BookOpen, Search, ShieldCheck } from 'lucide-react'
 import { useBooks } from '../../context/BooksContext'
 
 export const Home = () => {
-    const { totalBooks } = useBooks()
+    const { totalBooks, totalSubjects, totalAuthors } = useBooks()
     const [visible, setVisible] = useState(false)
 
     useEffect(() => {
@@ -13,9 +13,9 @@ export const Home = () => {
     }, [])
 
     const stats = [
-        { number: totalBooks > 0 ? `${totalBooks}+` : "5000+", label: "Volumes" },
-        { number: "100+", label: "Subjects" },
-        { number: "24/7", label: "Access" },
+        { number: totalBooks > 0 ? `${totalBooks}` : "2700", label: "Volumes" },
+        { number: totalSubjects > 0 ? `${totalSubjects}+` : "70", label: "Subjects" },
+        { number: totalAuthors > 0 ? `${totalAuthors}+` : "150", label: "Authors" },
     ]
 
     return (
@@ -37,7 +37,7 @@ export const Home = () => {
                         </defs>
                         <rect width="100%" height="100%" fill="url(#islamic)" className="text-neutral" />
                     </svg>
-                    <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-base-200/50 to-transparent" />
+                    <div className="absolute top-0 right-0 w-1/2 h-full bg-linear-to-l from-base-200/50 to-transparent" />
                     <div className="absolute bottom-0 left-0 w-96 h-96 rounded-full bg-neutral/5 blur-3xl" />
                 </div>
 

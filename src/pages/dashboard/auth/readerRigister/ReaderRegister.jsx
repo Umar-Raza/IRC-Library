@@ -63,11 +63,14 @@ export const ReaderRegister = () => {
             </div>
           </div>
           <h2 className="text-2xl font-bold text-neutral mb-3 font-sans">Request Submitted!</h2>
-          <p className="text-base-content/60 mb-6 leading-relaxed">
+          <p className="text-base-content/60 mb-2 leading-relaxed">
             آپ کی درخواست موصول ہوگئی ہے۔ لائبریرین آپ کی درخواست کا جائزہ لے رہے ہیں۔
-            <br /><br />
-            <span className="font-semibold text-neutral">ہم جلد آپ سے رابطہ کریں گے۔</span>
+            <br />
+            <span className="font-semibold text-neutral mt-1">ہم جلد آپ سے رابطہ کریں گے۔</span>
           </p>
+          <div className='mb-5'>
+            <a href="mailto:almadinatulilmia.fsd@dawateislami.net" className='btn-link hover:text-neutral'>Contact</a>
+          </div>
           <Link to="/login" className="btn btn-neutral btn-wide font-sans">
             Back to Login
           </Link>
@@ -106,6 +109,8 @@ export const ReaderRegister = () => {
                   type="text"
                   name="fullName"
                   className="input input-bordered w-full pl-10 focus:input-neutral transition-all text-[16px]"
+                  minLength={4}
+                  maxLength={12}
                   placeholder="Full Name"
                   value={formData.fullName}
                   onChange={handleChange}
@@ -126,8 +131,8 @@ export const ReaderRegister = () => {
                   name="email"
                   className="input input-bordered w-full pl-10 focus:input-neutral transition-all text-[16px]"
                   placeholder='example@gmail.com'
-                  onFocus={(e) => e.target.placeholder = "Enter an active email address"}
-                  onBlur={(e) => e.target.placeholder = "example@gmail.com"}
+                  onBlur={(e) => e.target.placeholder = "Enter an active email address"}
+                  onFocus={(e) => e.target.placeholder = "example@gmail.com"}
                   value={formData.email}
                   onChange={handleChange}
                   required
@@ -147,6 +152,8 @@ export const ReaderRegister = () => {
                   name="password"
                   className="input input-bordered w-full pl-10 pr-10 focus:input-neutral transition-all text-[16px]"
                   placeholder="••••••••"
+                  minLength={6}
+                  maxLength={20}
                   value={formData.password}
                   onChange={handleChange}
                   required
@@ -159,6 +166,15 @@ export const ReaderRegister = () => {
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
+            </div>
+            <div className="flex items-center justify-between px-1">
+              <label className="label cursor-pointer gap-2">
+                <input type="checkbox" className="checkbox checkbox-sm checkbox-neutral" />
+                <span className="label-text text-xs">Remember me</span>
+              </label>
+              <Link to="/login" className="text-xs text-neutral hover:underline font-semibold">
+                Forgot password?
+              </Link>
             </div>
             <div className="pt-4">
               <button

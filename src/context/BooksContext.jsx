@@ -16,14 +16,29 @@ export const BookProvider = ({ children }) => {
     const [sortBy, setSortBy] = useState('newest');
     const [searchTerm, setSearchTerm] = useState("");
     const [totalBooks, setTotalBooks] = useState(0);
+    const [totalSubjects, setTotalSubjects] = useState(0);
+    const [totalAuthors, setTotalAuthors] = useState(0);
 
     // To track loaded book IDs for real-time updates
     const loadedBookIds = useRef(new Set());
+
     useEffect(() => {
         const fetchTotalCount = async () => {
             try {
                 const snapshot = await getCountFromServer(collection(firestore, 'books'));
                 setTotalBooks(snapshot.data().count);
+
+                // subjects اور authors کی unique count
+                const allSnap = await getDocs(collection(firestore, 'books'));
+                const subjects = new Set();
+                const authors = new Set();
+                allSnap.docs.forEach(d => {
+                    const data = d.data();
+                    if (data.subject) subjects.add(data.subject.trim());
+                    if (data.author) authors.add(data.author.trim());
+                });
+                setTotalSubjects(subjects.size);
+                setTotalAuthors(authors.size);
             } catch (error) {
                 console.error("Count error:", error);
             }
@@ -174,7 +189,7 @@ export const BookProvider = ({ children }) => {
     return (
         <BookContext.Provider value={{
             books, loading, loadingMore, hasMore,
-            updateStatus, totalBooks,
+            updateStatus, totalBooks, totalSubjects, totalAuthors,
             fetchMore: fetchBooks, updatingBookId, setBooks, searchTerm, setSearchTerm, selectedSubject, setSelectedSubject, sortBy, setSortBy
         }}>
             {children}

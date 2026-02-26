@@ -25,7 +25,6 @@ export const LibrarianDashboard = () => {
   const [isProcessing, setIsProcessing] = useState(false)
   const fileInputRef = useRef(null)
   const [readers, setReaders] = useState([])
-  const [newReaderName, setNewReaderName] = useState('')
   const [editingBookId, setEditingBookId] = useState(null)
   const [activeBookId, setActiveBookId] = useState(null)
   const [pendingRequests, setPendingRequests] = useState([])
@@ -253,29 +252,6 @@ export const LibrarianDashboard = () => {
     return () => unsubscribe();
   }, []);
 
-  const handleAddNewReaderSubmit = async () => {
-    const trimmedName = newReaderName.trim();
-    if (!trimmedName) return;
-
-    setIsProcessing(true);
-    try {
-      await addDoc(collection(firestore, 'readers'), {
-        name: trimmedName,
-        createdAt: new Date()
-      });
-      if (activeBookId) {
-        await updateStatus(activeBookId, trimmedName);
-      }
-      setNewReaderName('');
-      document.getElementById('reader_modal').close();
-      toast.success('New reader added successfully!');
-    } catch (err) {
-      toast.error("Something went wrong while adding new reader!");
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
   const [issuedBooksList, setIssuedBooksList] = useState([]);
   const [issuedLoading, setIssuedLoading] = useState(false);
 
@@ -414,7 +390,6 @@ export const LibrarianDashboard = () => {
             </div>
           </dialog>
         </div>
-
         <div className="rounded-xl p-4 mb-6 border border-base-300" dir="rtl">
           <div className="flex flex-col lg:flex-row items-stretch gap-3">
             {/* Search Field */}
@@ -561,7 +536,7 @@ export const LibrarianDashboard = () => {
                   <UserCheck className="w-12 h-12 text-neutral" />
                 </div>
               </div>
-              <p className='text-2xl'>No pending requests</p>
+              <p className='text-1xl'>No pending requests</p>
             </div>
           ) : (
             <div className="space-y-3 max-h-96 overflow-y-auto">
@@ -611,7 +586,7 @@ export const LibrarianDashboard = () => {
                     <LibraryBig className="w-12 h-12 text-neutral" />
                   </div>
                 </div>
-                <p className="text-base-content/60 text-1xl font-bold">No Issued Books</p>
+                <p className="text-neutral/60  font-bold">No Issued Books</p>
               </div>
             ) : (
               issuedBooksList.map((book) => (
@@ -693,7 +668,7 @@ export const LibrarianDashboard = () => {
                   <ClipboardList className="w-12 h-12 text-neutral" />
                 </div>
               </div>
-              <p className=" mt-1 text-neutral/60 text-1xl font-bold">This book has no logs.</p>
+              <p className=" mt-1 text-neutral/60  font-bold">This book has no logs.</p>
             </div>
           ) : bookLogs.length > 0 ? (
             <>
@@ -718,7 +693,7 @@ export const LibrarianDashboard = () => {
             </>
           ) : (
             <div className="text-center py-6 font-bold text-neutral/60">
-              <p>No logs available for this book.</p>
+              <p>Search Books Name to see logs.</p>
             </div>
           )}
         </div>

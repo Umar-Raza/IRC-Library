@@ -1,11 +1,11 @@
 import React from 'react'
-import { Book, Download, EllipsisVertical, Loader, SquarePen } from 'lucide-react'
+import { Book, BookDown, Download, EllipsisVertical, Loader, SquareMousePointer, SquarePen } from 'lucide-react'
 import { DeleteBook } from '@/pages/dashboard/librarianDasboard/DeleteBook';
 import { toast } from 'react-hot-toast';
 import { useBooks } from '@/context/BooksContext';
 import { useAuth } from '@/context/AuthContext';
 
-export const BooksTable = ({ books, handleEditBook,  updateStatus, loading, isAdmin = false }) => {
+export const BooksTable = ({ books, handleEditBook, updateStatus, loading, isAdmin = false }) => {
 
   const { readerName, isLibrarian } = useAuth();
   const { updatingBookId } = useBooks();
@@ -80,7 +80,7 @@ export const BooksTable = ({ books, handleEditBook,  updateStatus, loading, isAd
                           </div>
                         )}
 
-                        <div className="card-body p-2">
+                        <div className="card-body p-2 flex items-center justify-center">
                           <h3 className="card-title mx-auto text-sm text-center leading-tight">{book.bookName}</h3>
                         </div>
                       </div>
@@ -142,7 +142,7 @@ export const BooksTable = ({ books, handleEditBook,  updateStatus, loading, isAd
                             <button
                               onClick={() => !isUpdating && updateStatus(book.id, readerName)}
                               disabled={isUpdating}
-                              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold bg-neutral text-white border border-neutral shadow-sm hover:opacity-80 transition-opacity cursor-pointer disabled:opacity-60"
+                              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold bg-neutral text-white border border-neutral font-sens-semibold shadow-sm hover:opacity-80 transition-opacity cursor-pointer disabled:opacity-60"
                             >
                               {isUpdating ? <Loader className="w-5 h-4 animate-spin" /> : 'Borrow'}
                             </button>

@@ -2,7 +2,7 @@ import { SquareLibrary, Eye, EyeOff, MailIcon, LockIcon, Loader } from 'lucide-r
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { auth } from '@/config/Firebase'
-import { signInWithEmailAndPassword } from 'firebase/auth'
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth'
 import toast from 'react-hot-toast'
 import { useAuth } from '@/context/AuthContext'
 
@@ -10,7 +10,7 @@ export const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { user, isLibrarian } = useAuth();
+  const { user, isLibrarian, isApproved, loading: authLoading } = useAuth();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -19,31 +19,41 @@ export const Login = () => {
 
   // Redirect based on user role after login
   useEffect(() => {
-    if (user) {
+    if (user && !authLoading) {
       if (isLibrarian) {
         navigate('/librarian-dashboard');
-      } else {
+      } else if (isApproved) {
         navigate('/IRCLibrary');
+      } else {
+        navigate('/pending');
       }
     }
-  }, [user, isLibrarian, navigate]);
+  }, [user, isLibrarian, isApproved, authLoading, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const result = await signInWithEmailAndPassword(auth, formData.email, formData.password);
+      await signInWithEmailAndPassword(auth, formData.email, formData.password);
       toast.success("Login successful!");
-      // Check if the logged-in user is the librarian
-      if (result.user.email === "almadinatulilmia.fsd@dawateislami.net") {
-        navigate('/librarian-dashboard');
-      } else {
-        navigate('/IRCLibrary');
-      }
+      // loading یہاں false نہیں کریں گے — authLoading ختم ہونے پر useEffect redirect کرے گا
     } catch (error) {
       toast.error("LOGIN FAILED! Please check your credentials and try again.");
-    } finally {
-      setLoading(false);
+      setLoading(false); // صرف error پر false کریں
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!formData.email) {
+      toast.error("Please enter your email address first.");
+      return;
+    }
+    try {
+      await sendPasswordResetEmail(auth, formData.email);
+      toast.success("Password reset link sent to your email!");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to send reset email. Please check the email address.");
     }
   };
 
@@ -113,13 +123,18 @@ export const Login = () => {
                 </button>
               </div>
             </div>
+            <div className="flex justify-end px-1">
+              <button type="button" onClick={handleForgotPassword} className="text-xs text-neutral hover:underline font-semibold">
+                Forgot password?
+              </button>
+            </div>
             <div className="pt-4">
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || authLoading}
                 className="btn btn-neutral w-full text-lg shadow-lg transition-all normal-case"
               >
-                {loading ? <Loader className="w-5 h-5 animate-spin" /> : "Sign In"}
+                {(loading || authLoading) ? <Loader className="w-5 h-5 animate-spin" /> : "Sign In"}
               </button>
             </div>
           </form>
