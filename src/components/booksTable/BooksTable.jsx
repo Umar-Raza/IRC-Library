@@ -1,5 +1,5 @@
 import React from 'react'
-import { Book, BookDown, Download, EllipsisVertical, Loader, SquareMousePointer, SquarePen } from 'lucide-react'
+import { Book,  Download, EllipsisVertical, Loader, SquareMousePointer, SquarePen } from 'lucide-react'
 import { DeleteBook } from '@/pages/dashboard/librarianDasboard/DeleteBook';
 import { toast } from 'react-hot-toast';
 import { useBooks } from '@/context/BooksContext';
@@ -12,20 +12,20 @@ export const BooksTable = ({ books, handleEditBook, updateStatus, loading, isAdm
 
   const SkeletonRow = () => (
     <tr className="animate-pulse">
-      <td><div className="h-4 w-4 bg-base-300 rounded"></div></td>
-      <td><div className="h-14 w-14 bg-base-300 rounded-xl"></div></td>
-      <td>
+      <td className="py-4"><div className="h-7 w-8 bg-base-300 rounded"></div></td>
+      <td className="py-4"><div className="h-21 w-18 bg-base-300 rounded"></div></td>
+      <td className="py-4">
         <div className="h-4 w-32 bg-base-300 rounded mb-2"></div>
         <div className="h-3 w-24 bg-base-300 rounded"></div>
       </td>
-      <td>
+      <td className="py-4">
         <div className="h-3 w-24 bg-base-300 rounded"></div>
         <div className="h-4 w-20 bg-base-300 rounded mb-2 mt-2"></div>
         <div className="h-4 w-16 bg-base-300 rounded"></div>
       </td>
-      <td><div className="h-8 w-27 bg-base-300 rounded"></div></td>
-      <td><div className="h-8 w-36 bg-base-300 rounded mx-auto"></div></td>
-      {isAdmin && <td><div className="h-8 w-8 bg-base-300 rounded mx-auto"></div></td>}
+      <td className="py-4"><div className="h-10 w-28 bg-base-300 rounded mx-auto"></div></td>
+      <td className="py-4"><div className="h-10 w-32 bg-base-300 rounded-full mx-auto"></div></td>
+      {isAdmin && <td className="py-4"><div className="h-8 w-8 bg-base-300 rounded mx-auto"></div></td>}
     </tr>
   );
 
@@ -47,7 +47,7 @@ export const BooksTable = ({ books, handleEditBook, updateStatus, loading, isAdm
           </thead>
           <tbody>
             {loading ? (
-              [...Array(10)].map((_, i) => <SkeletonRow key={i} />)
+              [...Array(5)].map((_, i) => <SkeletonRow key={i} />)
             ) : (
               books.map((book, index) => (
                 <tr key={book.id} className="border-b border-base-300 align-top">

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { collection, query, orderBy, onSnapshot, getDocs } from 'firebase/firestore'
+import { collection, query, orderBy, onSnapshot } from 'firebase/firestore'
 import { Loader, SearchIcon, SearchX } from 'lucide-react'
 import { firestore } from '@/config/Firebase';
 import { BooksTable } from '@/components/booksTable/BooksTable';
@@ -8,7 +8,6 @@ import { ChevronDown, } from 'lucide-react';
 import { useBooks } from '@/context/BooksContext';
 export const IRCLibrary = () => {
 
-  const [subjectFilter, setSubjectFilter] = useState('');
   const [sortOrder, setSortOrder] = useState('ترتیب منتخب کریں');
   const [readers, setReaders] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -17,16 +16,18 @@ export const IRCLibrary = () => {
   const [isSortOpen, setIsSortOpen] = useState(false);
   const sortRef = useRef(null);
   const sortOptions = ["ا → ے", "ے → ا"];
-  const [availableSubjects, setAvailableSubjects] = useState([]);
+  const [visibleCount, setVisibleCount] = useState(10); // پہلے 10 subjects
+  const subjectListRef = useRef(null);
 
   //  Books Context
-  const { books, loading, loadingMore, hasMore, fetchMore, updateStatus, totalBooks, selectedSubject, setSelectedSubject, searchTerm, setSearchTerm, sortBy, setSortBy } = useBooks();
+  const { books, loading, loadingMore, hasMore, fetchMore, updateStatus, availableSubjects, selectedSubject, setSelectedSubject, searchTerm, setSearchTerm, setSortBy } = useBooks();
 
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setIsDropdownOpen(false);
         setSubjectSearch("");
+        setVisibleCount(10); // Reset dropdown After close  
       }
       if (sortRef.current && !sortRef.current.contains(e.target)) {
         setIsSortOpen(false);
@@ -45,38 +46,27 @@ export const IRCLibrary = () => {
     return () => unsubscribe();
   }, []);
 
+  // Subject list load with scroll 
   useEffect(() => {
-    const fetchSubjects = async () => {
-      try {
-        const snapshot = await getDocs(collection(firestore, 'books'));
-        const uniqueSubjects = [
-          ...new Set(snapshot.docs.map(doc => doc.data().subject))
-        ].filter(Boolean).sort();
-        setAvailableSubjects(uniqueSubjects);
-      } catch (error) {
-        console.error("Subjects load error:", error);
+    const el = subjectListRef.current;
+    if (!el) return;
+    const handleScroll = () => {
+      if (el.scrollTop + el.clientHeight >= el.scrollHeight - 10) {
+        setVisibleCount(v => v + 10);
       }
     };
-    fetchSubjects();
-  }, []);
+    el.addEventListener('scroll', handleScroll);
+    return () => el.removeEventListener('scroll', handleScroll);
+  }, [isDropdownOpen]);
 
   const filteredSubjects = availableSubjects.filter(s =>
     s.toLowerCase().includes(subjectSearch.toLowerCase())
   );
+  const displayedSubjects = subjectSearch ? filteredSubjects : filteredSubjects.slice(0, visibleCount);
+  const hasMore_subjects = !subjectSearch && filteredSubjects.length > visibleCount;
   return (
     <div className="card bg-base-100 shadow-xl my-4 w-[98%] zain-light lg:w-[94%] xl:w-[92%] mx-auto border border-base-200 ">
       <div className="card-body">
-        {/* <div className="flex flex-wrap items-center justify-center gap-2 py-4 text-sm sm:text-lg text-neutral" dir="rtl">
-          <span>اسلامک ریسرچ سینٹر فیصل آباد میں کل</span>
-          <span className="inline-flex items-center justify-center font-bold bg-neutral text-white px-3 py-0.5 rounded-lg min-w-[2.5rem]">
-            {totalBooks === 0 ? (
-              <Loader className="w-4 h-4 animate-spin" />
-            ) : (
-              totalBooks
-            )}
-          </span>
-          <span>مجلدات موجود ہیں۔</span>
-        </div> */}
         <div className="bg-base-100 rounded-xl shadow  border border-base-300 p-4 mb-2" dir="rtl">
           <div className="flex flex-col md:flex-row items-stretch gap-3">
             <div className="flex-1 lg:flex-2 min-w-0">
@@ -109,13 +99,14 @@ export const IRCLibrary = () => {
                       />
                     </div>
                   </div>
-                  <ul className="max-h-60 overflow-y-auto p-1 z-999">
+                  <ul className="max-h-60 overflow-y-auto p-1 z-999" ref={subjectListRef}>
                     <li
                       className={`p-2 hover:bg-neutral hover:text-white rounded cursor-pointer ${selectedSubject === "All" ? 'bg-neutral text-white' : ''}`}
                       onClick={() => {
                         setSelectedSubject("All");
                         setIsDropdownOpen(false);
                         setSubjectSearch("");
+                        setVisibleCount(10);
                       }}
                     >
                       تمام مضامین
@@ -125,19 +116,27 @@ export const IRCLibrary = () => {
                         معذرت! <span className="font-bold text-neutral">"{subjectSearch}"</span> کا مضمون نہیں ملا۔
                       </li>
                     ) : (
-                      filteredSubjects.map((subject) => (
-                        <li
-                          key={subject}
-                          className={`p-2 hover:bg-neutral hover:text-white rounded cursor-pointer mt-1 ${selectedSubject === subject ? 'bg-neutral text-white' : ''}`}
-                          onClick={() => {
-                            setSelectedSubject(subject);
-                            setIsDropdownOpen(false);
-                            setSubjectSearch("");
-                          }}
-                        >
-                          {subject}
-                        </li>
-                      ))
+                      <>
+                        {displayedSubjects.map((subject) => (
+                          <li
+                            key={subject}
+                            className={`p-2 hover:bg-neutral hover:text-white rounded cursor-pointer mt-1 ${selectedSubject === subject ? 'bg-neutral text-white' : ''}`}
+                            onClick={() => {
+                              setSelectedSubject(subject);
+                              setIsDropdownOpen(false);
+                              setSubjectSearch("");
+                              setVisibleCount(10);
+                            }}
+                          >
+                            {subject}
+                          </li>
+                        ))}
+                        {hasMore_subjects && (
+                          <li className="p-2 mt-1 text-center text-xs text-base-content/30 select-none">
+                            ↓ مزید دیکھنے کے لیے نیچے scroll کریں
+                          </li>
+                        )}
+                      </>
                     )}
                   </ul>
                 </div>
@@ -190,7 +189,9 @@ export const IRCLibrary = () => {
               </h3>
               <p className="text-xl mt-2 text-base-content/40">
                 {searchTerm
-                  ? `آپ کی تلاش "${searchTerm}" کے مطابق کوئی نتیجہ نہیں ملا۔`
+                  ? (
+                    <span>آپ کی تلاش <span className="font-bold text-neutral">"{searchTerm}"</span> کے مطابق کوئی نتیجہ نہیں ملا۔</span>
+                  )
                   : "اس مضمون میں فی الحال کوئی کتاب دستیاب نہیں ہے۔"}
               </p>
             </div>

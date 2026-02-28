@@ -33,7 +33,9 @@ export const LibrarianDashboard = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [subjectSearch, setSubjectSearch] = useState("")
   const [availableSubjects, setAvailableSubjects] = useState([])
+  const [visibleCount, setVisibleCount] = useState(10)
   const dropdownRef = useRef(null)
+  const subjectListRef = useRef(null)
 
   // Sort Dropdown state
   const [isSortOpen, setIsSortOpen] = useState(false)
@@ -93,6 +95,7 @@ export const LibrarianDashboard = () => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setIsDropdownOpen(false)
         setSubjectSearch("")
+        setVisibleCount(10)
       }
       if (sortRef.current && !sortRef.current.contains(e.target)) {
         setIsSortOpen(false)
@@ -120,6 +123,22 @@ export const LibrarianDashboard = () => {
   const filteredSubjects = availableSubjects.filter(s =>
     s.toLowerCase().includes(subjectSearch.toLowerCase())
   )
+
+  // Load subject with infinite scroll
+  useEffect(() => {
+    const el = subjectListRef.current;
+    if (!el) return;
+    const handleScroll = () => {
+      if (el.scrollTop + el.clientHeight >= el.scrollHeight - 10) {
+        setVisibleCount(v => v + 10);
+      }
+    };
+    el.addEventListener('scroll', handleScroll);
+    return () => el.removeEventListener('scroll', handleScroll);
+  }, [isDropdownOpen]);
+
+  const displayedSubjects = subjectSearch ? filteredSubjects : filteredSubjects.slice(0, visibleCount);
+  const hasMoreSubjects = !subjectSearch && filteredSubjects.length > visibleCount;
 
   const handleChange = (e) => {
     if (e.target.type === 'file') {
@@ -420,10 +439,10 @@ export const LibrarianDashboard = () => {
                       />
                     </div>
                   </div>
-                  <ul className="max-h-60 overflow-y-auto p-1">
+                  <ul className="max-h-60 overflow-y-auto p-1" ref={subjectListRef}>
                     <li
                       className={`p-2 hover:bg-neutral hover:text-white rounded cursor-pointer ${selectedSubject === "All" ? 'bg-neutral text-white' : ''}`}
-                      onClick={() => { setSelectedSubject("All"); setIsDropdownOpen(false); setSubjectSearch(""); }}
+                      onClick={() => { setSelectedSubject("All"); setIsDropdownOpen(false); setSubjectSearch(""); setVisibleCount(10); }}
                     >
                       تمام مضامین
                     </li>
@@ -432,15 +451,22 @@ export const LibrarianDashboard = () => {
                         معذرت! <span className="font-bold text-neutral">"{subjectSearch}"</span> کا مضمون نہیں ملا۔
                       </li>
                     ) : (
-                      filteredSubjects.map((subject) => (
-                        <li
-                          key={subject}
-                          className={`p-2 hover:bg-neutral hover:text-white rounded cursor-pointer mt-1 ${selectedSubject === subject ? 'bg-neutral text-white' : ''}`}
-                          onClick={() => { setSelectedSubject(subject); setIsDropdownOpen(false); setSubjectSearch(""); }}
-                        >
-                          {subject}
-                        </li>
-                      ))
+                      <>
+                        {displayedSubjects.map((subject) => (
+                          <li
+                            key={subject}
+                            className={`p-2 hover:bg-neutral hover:text-white rounded cursor-pointer mt-1 ${selectedSubject === subject ? 'bg-neutral text-white' : ''}`}
+                            onClick={() => { setSelectedSubject(subject); setIsDropdownOpen(false); setSubjectSearch(""); setVisibleCount(10); }}
+                          >
+                            {subject}
+                          </li>
+                        ))}
+                        {hasMoreSubjects && (
+                          <li className="p-2 mt-1 text-center text-xs text-base-content/30 select-none">
+                            ↓ مزید دیکھنے کے لیے نیچے scroll کریں
+                          </li>
+                        )}
+                      </>
                     )}
                   </ul>
                 </div>
@@ -692,7 +718,7 @@ export const LibrarianDashboard = () => {
               </ol>
             </>
           ) : (
-            <div className="text-center py-6 font-bold text-neutral/60">
+            <div className="text-center py-6 text-neutral/60">
               <p>Search Books Name to see logs.</p>
             </div>
           )}

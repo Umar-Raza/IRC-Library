@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { collection, query, orderBy, limit, startAfter, getDocs, doc, updateDoc, where, getCountFromServer, addDoc, writeBatch, onSnapshot } from 'firebase/firestore';
+import { collection, query, orderBy, limit, startAfter, getDocs, doc, getDoc, setDoc, updateDoc, where, addDoc, writeBatch, onSnapshot } from 'firebase/firestore';
 import { firestore } from '@/config/Firebase';
 import toast from 'react-hot-toast';
 
@@ -18,32 +18,52 @@ export const BookProvider = ({ children }) => {
     const [totalBooks, setTotalBooks] = useState(0);
     const [totalSubjects, setTotalSubjects] = useState(0);
     const [totalAuthors, setTotalAuthors] = useState(0);
+    const [availableSubjects, setAvailableSubjects] = useState([]);
 
     // To track loaded book IDs for real-time updates
     const loadedBookIds = useRef(new Set());
 
     useEffect(() => {
-        const fetchTotalCount = async () => {
+        const fetchMetadata = async () => {
             try {
-                const snapshot = await getCountFromServer(collection(firestore, 'books'));
-                setTotalBooks(snapshot.data().count);
+                const metaSnap = await getDoc(doc(firestore, 'metadata', 'library'));
+                if (metaSnap.exists()) {
+                    const meta = metaSnap.data();
+                    setTotalBooks(meta.totalBooks || 0);
+                    setTotalSubjects(meta.totalSubjects || 0);
+                    setTotalAuthors(meta.totalAuthors || 0);
+                    setAvailableSubjects(meta.subjects || []);
+                } else {
+                    // Metadata not found — fetch using old method and create metadata
+                    const allSnap = await getDocs(collection(firestore, 'books'));
+                    const subjects = new Set();
+                    const authors = new Set();
+                    allSnap.docs.forEach(d => {
+                        const data = d.data();
+                        if (data.subject) subjects.add(data.subject.trim());
+                        if (data.author) authors.add(data.author.trim());
+                    });
+                    const subjectsArr = [...subjects].sort();
+                    setTotalBooks(allSnap.size);
+                    setTotalSubjects(subjects.size);
+                    setTotalAuthors(authors.size);
+                    setAvailableSubjects(subjectsArr);
 
-                // subjects اور authors کی unique count
-                const allSnap = await getDocs(collection(firestore, 'books'));
-                const subjects = new Set();
-                const authors = new Set();
-                allSnap.docs.forEach(d => {
-                    const data = d.data();
-                    if (data.subject) subjects.add(data.subject.trim());
-                    if (data.author) authors.add(data.author.trim());
-                });
-                setTotalSubjects(subjects.size);
-                setTotalAuthors(authors.size);
+                    // Create metadata document manually
+                    await setDoc(doc(firestore, 'metadata', 'library'), {
+                        totalBooks: allSnap.size,
+                        totalSubjects: subjects.size,
+                        totalAuthors: authors.size,
+                        subjects: subjectsArr,
+                        updatedAt: new Date()
+                    });
+                    console.log('✅ metadata document بن گیا');
+                }
             } catch (error) {
-                console.error("Count error:", error);
+                console.error("Metadata fetch error:", error);
             }
         };
-        fetchTotalCount();
+        fetchMetadata();
     }, []);
 
     //  Real-time status listener —  status field watch
@@ -109,7 +129,7 @@ export const BookProvider = ({ children }) => {
                 constraints.push(startAfter(lastDoc));
             }
 
-            constraints.push(limit(10));
+            constraints.push(limit(5));
 
             const q = query(booksRef, ...constraints);
             const snapshot = await getDocs(q);
@@ -125,7 +145,7 @@ export const BookProvider = ({ children }) => {
             });
 
             setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
-            setHasMore(snapshot.docs.length === 10);
+            setHasMore(snapshot.docs.length === 5);
 
         } catch (error) {
             setBooks([]);
@@ -189,7 +209,7 @@ export const BookProvider = ({ children }) => {
     return (
         <BookContext.Provider value={{
             books, loading, loadingMore, hasMore,
-            updateStatus, totalBooks, totalSubjects, totalAuthors,
+            updateStatus, totalBooks, totalSubjects, totalAuthors, availableSubjects,
             fetchMore: fetchBooks, updatingBookId, setBooks, searchTerm, setSearchTerm, selectedSubject, setSelectedSubject, sortBy, setSortBy
         }}>
             {children}

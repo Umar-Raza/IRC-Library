@@ -9,18 +9,18 @@ const LIBRARIAN_EMAIL = "almadinatulilmia.fsd@dawateislami.net";
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [initialLoad, setInitialLoad] = useState(true); // صرف پہلی بار refresh کے لیے
+    const [initialLoad, setInitialLoad] = useState(true); // Only for the first refresh
     const [readerName, setReaderName] = useState(null);
     const [isApproved, setIsApproved] = useState(false);
-    const [isNewApproval, setIsNewApproval] = useState(false); // صرف approval کے وقت true
+    const [isNewApproval, setIsNewApproval] = useState(false); // true only at the time of approval
 
     useEffect(() => {
         let readerUnsubscribe = null;
-        let prevApproved = null; // پچھلی approval state track کریں
+        let prevApproved = null; // track previous approval state
 
         const authUnsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser || null);
-            setLoading(true); // ہر بار user change پر loading reset کریں
+            setLoading(true); // Reset loading every time the user changes
             prevApproved = null;
 
             if (readerUnsubscribe) {
@@ -36,14 +36,14 @@ export const AuthProvider = ({ children }) => {
 
                 readerUnsubscribe = onSnapshot(q, (snap) => {
                     if (!snap.empty) {
-                        // سب سے نیا record لیں
+                        // Get the latest record
                         const sorted = snap.docs
                             .map(d => ({ id: d.id, ...d.data() }))
                             .sort((a, b) => b.createdAt?.toDate() - a.createdAt?.toDate());
                         const data = sorted[0];
                         const approved = data.status === 'approved';
 
-                        // صرف تب isNewApproval=true جب pending سے approved ہوا ہو
+                        // Set isNewApproval=true only when status changes from pending to approved
                         if (prevApproved === false && approved === true) {
                             setIsNewApproval(true);
                         } else {
