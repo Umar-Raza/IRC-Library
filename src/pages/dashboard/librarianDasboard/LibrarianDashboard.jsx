@@ -621,7 +621,7 @@ export const LibrarianDashboard = () => {
                     <p className="font-bold text-neutral text-sm truncate">{book.bookName}</p>
                     <p className="text-xs text-base-content/40 mt-0.5">
                       {book.updatedAt?.toDate
-                        ? book.updatedAt.toDate().toLocaleString('ur-PK', { dateStyle: 'medium', timeStyle: 'short' })
+                        ? book.updatedAt.toDate().toLocaleString('eng-us', { dateStyle: 'medium', timeStyle: 'short' })
                         : '—'}
                     </p>
                   </div>
@@ -709,7 +709,7 @@ export const LibrarianDashboard = () => {
                       <p className="font-bold text-neutral">{log.readerName}</p>
                       <p className="text-xs text-base-content/50 mt-0.5">
                         {log.takenAt?.toDate
-                          ? log.takenAt.toDate().toLocaleString('ur-PK', { dateStyle: 'medium', timeStyle: 'short' })
+                          ? log.takenAt.toDate().toLocaleString('eng-us', { dateStyle: 'medium', timeStyle: 'short' })
                           : '—'}
                       </p>
                     </div>

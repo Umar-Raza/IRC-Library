@@ -57,13 +57,13 @@ export const BooksTable = ({ books, handleEditBook, updateStatus, loading, isAdm
                       index > books.length - 3 ? 'dropdown-top' : 'dropdown-right'}`}>
 
                       {book.createdAt && (new Date() - book.createdAt.toDate()) / (1000 * 60 * 60 * 24) <= 15 && (
-                        <span className="badge badge-accent badge-sm font-sans animate-pulse absolute bottom-17 -right-7 z-[10]">NEW</span>
+                        <span className="badge badge-accent badge-sm font-sans animate-pulse absolute bottom-17 -right-7 ">NEW</span>
                       )}
 
                       {book.titlePage ? (
                         <img
                           src={book.titlePage}
-                          className="w-18 h-21 rounded-sm object-cover shadow cursor-pointer"
+                          className="w-18 h-21  rounded-sm object-cover shadow cursor-pointer"
                           alt={book.bookName}
                         />
                       ) : (
@@ -71,7 +71,7 @@ export const BooksTable = ({ books, handleEditBook, updateStatus, loading, isAdm
                           {book.bookName}
                         </div>
                       )}
-                      <div className={`dropdown-content z-11 card card-compact w-48 p-1 shadow-2xl bg-base-100 border border-base-300 ${index < 2 ? 'mt-2' : index > books.length - 3 ? 'mb-2' : 'ml-2'}`}>
+                      <div className={`dropdown-content z-11 card card-compact w-48 p-1 shadow-2xl  bg-base-100 border border-base-300 ${index < 2 ? 'mt-2' : index > books.length - 3 ? 'mb-2' : 'ml-2'}`}>
                         {book.titlePage ? (
                           <img src={book.titlePage} className="w-48 h-64 rounded-lg object-cover" alt={book.bookName} />
                         ) : (

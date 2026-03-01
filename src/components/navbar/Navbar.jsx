@@ -38,8 +38,8 @@ export const Navbar = () => {
                 <SquareLibrary className="text-neutral w-6 h-6 sm:w-9 sm:h-9" />
                 <Link to="/">
                     <span className="text-lg sm:text-2xl font-bold text-neutral group-hover:text-[#457b9d] transition-colors">
-                        <span className="hidden sm:inline">Islamic Research Center Library</span>
-                        <span className="sm:hidden text-sm">IRC Library</span>
+                        <span className="hidden sm:inline">Islamic Research Center</span>
+                        <span className="sm:hidden text-md">IRC</span>
                     </span>
                 </Link>
             </div>
@@ -69,7 +69,7 @@ export const Navbar = () => {
                 ) : (
                     <Link
                         to="/login"
-                        className="btn btn-neutral btn-dash btn-outline btn-sm sm:btn-md gap-2  transition-all"
+                        className="btn btn-neutral btn-dash btn-outline btn-sm gap-2  transition-all"
                     >
                         <span className="hidden sm:inline">Login</span>
                         <LogIn size={18} />

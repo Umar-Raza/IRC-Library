@@ -1,7 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { collection, query, orderBy, onSnapshot } from 'firebase/firestore'
 import { Loader, SearchIcon, SearchX } from 'lucide-react'
-import { firestore } from '@/config/Firebase';
 import { BooksTable } from '@/components/booksTable/BooksTable';
 import { SearchBooks } from '@/components/searchBooks/SearchBooks';
 import { ChevronDown, } from 'lucide-react';
@@ -9,14 +7,13 @@ import { useBooks } from '@/context/BooksContext';
 export const IRCLibrary = () => {
 
   const [sortOrder, setSortOrder] = useState('ترتیب منتخب کریں');
-  const [readers, setReaders] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [subjectSearch, setSubjectSearch] = useState("");
   const dropdownRef = useRef(null);
   const [isSortOpen, setIsSortOpen] = useState(false);
   const sortRef = useRef(null);
   const sortOptions = ["ا → ے", "ے → ا"];
-  const [visibleCount, setVisibleCount] = useState(10); // پہلے 10 subjects
+  const [visibleCount, setVisibleCount] = useState(10);
   const subjectListRef = useRef(null);
 
   //  Books Context
@@ -35,15 +32,6 @@ export const IRCLibrary = () => {
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  useEffect(() => {
-    const q = query(collection(firestore, 'readers'), orderBy('name', 'asc'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setReaders(list);
-    });
-    return () => unsubscribe();
   }, []);
 
   // Subject list load with scroll 
@@ -200,7 +188,6 @@ export const IRCLibrary = () => {
               books={books}
               loading={loading}
               isAdmin={false}
-              readers={readers}
               updateStatus={updateStatus}
               searchTerm={searchTerm}
             />
