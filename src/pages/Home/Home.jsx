@@ -11,8 +11,8 @@ export const Home = () => {
     return (
         <>  
             <HeroSection />
-            <About/>
-            <Contact />
+            {/* <About/>
+            <Contact /> */}
         </>
     )
 }
