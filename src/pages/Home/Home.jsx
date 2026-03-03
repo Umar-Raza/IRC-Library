@@ -9,10 +9,10 @@ import HeroSection from '@/components/heroSection/HeroSection'
 export const Home = () => {
 
     return (
-        <>  
+        <>
             <HeroSection />
-            {/* <About/>
-            <Contact /> */}
+            <About />
+            <Contact />
         </>
     )
 }

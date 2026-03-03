@@ -64,8 +64,8 @@ export default function App() {
                     {/* ایکشن بٹنز (Action Buttons) */}
                     <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12 w-full max-w-sm sm:max-w-none mx-auto">
 
-                        <Link to="/readerRegister">
-                            <button className="relative group cursor-pointer overflow-hidden w-full sm:w-auto min-w-[200px] px-8 py-3.5 sm:py-4 rounded-xl bg-neutral text-base-100 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-base-100 flex items-center justify-center gap-3">
+                        <Link to="/readerRegister" className='w-80 sm:w-auto'>
+                            <button className="relative group cursor-pointer overflow-hidden w-full sm:w-auto min-w-50 px-8 py-3.5 sm:py-4 rounded-xl bg-neutral text-base-100 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-base-100 flex items-center justify-center gap-3">
                                 <div className="absolute inset-0 bg-gradient-to-r from-[oklch(50%_0.05_240)] via-[oklch(55%_0.05_240)] to-[oklch(50%_0.05_240)]" />
                                 <BookOpen size={18} strokeWidth={2} className="relative z-10 group-hover:rotate-12 transition-transform duration-300" />
                                 <span className="relative z-10 font-bold tracking-wide text-sm sm:text-base">Enter Library</span>
@@ -73,10 +73,10 @@ export default function App() {
                                 <div className="absolute inset-0 w-[200%] bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_2s_infinite]" />
                             </button>
                         </Link>
-                        <Link to="/IRCLibrary">
-                            <button className="relative group cursor-pointer overflow-hidden w-full sm:w-auto min-w-50 px-8 py-3.5 sm:py-4 rounded-xl bg-white border border-[oklch(92%_0.04_240)] text-[oklch(20%_0.05_240)] transition-all duration-300 hover:border-[oklch(50%_0.05_240)] flex items-center justify-center gap-3 shadow-sm">
+                        <Link to="/IRCLibrary" className='w-80 sm:w-auto'>
+                            <button className="relative group cursor-pointer overflow-hidden w-full sm:w-auto min-w-50 px-8 py-3.5 sm:py-4 rounded-xl bg-base-100 border border-neutral transition-all hover:bg-neutral/10 text-neutral   duration-300  flex items-center justify-center gap-3 shadow-sm">
                                 <Search size={18} strokeWidth={2} className="relative z-10 text-neutral group-hover:scale-110 transition-transform duration-300" />
-                                <span className="relative z-10 font-bold tracking-wide text-sm text-neutral">Search Archive</span>
+                                <span className="relative z-10 font-bold tracking-wide text-sm ">Search Archive</span>
                                 <div className="absolute inset-0 w-[200%] bg-gradient-to-r from-transparent via-[oklch(50%_0.05_240/0.05)] to-transparent -translate-x-full group-hover:animate-[shimmer_2s_infinite]" />
                             </button>
                         </Link>

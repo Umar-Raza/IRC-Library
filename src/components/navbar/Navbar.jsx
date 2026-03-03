@@ -1,5 +1,5 @@
 import { useAuth } from '@/context/AuthContext';
-import { LogIn, LogOut, SquareLibrary } from 'lucide-react'
+import { LogIn, SquareLibrary } from 'lucide-react'
 import React from 'react'
 import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom'
@@ -46,30 +46,33 @@ export const Navbar = () => {
 
             <div className="navbar-end flex items-end gap-4">
                 {user ? (
-                    <div className="flex items-center gap-3">
-                        <div className="hidden md:flex flex-col items-end">
-                            {/* <span className="text-sm font-bold text-neutral leading-none">Librarian</span> */}
-                            <span className="text-xs text-base-content/60">{user.email}</span>
-                            {user.email === "almadinatulilmia.fsd@dawateislami.net" && (
-                                <button className='btn-link cursor-pointer hover:text-neutral' onClick={() => navigate('/librarian-dashboard')}>Librarian Dashboard</button>
-                            )}
-                            {user.email !== "almadinatulilmia.fsd@dawateislami.net" && (
-                                <button className='btn-link cursor-pointer hover:text-neutral' onClick={() => navigate('/IRCLibrary')}>IRC Library</button>
-                            )}
+                    <div className="dropdown dropdown-end dropdown-bottom">
+                        <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
+                            <div className="w-10 rounded-full bg-neutral text-neutral-content flex items-center justify-center">
+                                <span className="text-sm font-bold">
+                                    {user.displayName 
+                                        ? user.displayName.split(' ').map(name => name.charAt(0).toUpperCase()).join('')
+                                        : user.email.charAt(0).toUpperCase()
+                                    }
+                                </span>
+                            </div>
                         </div>
-
-                        <button
-                            onClick={handleLogout}
-                            className="btn btn-error btn-dash btn-outline btn-sm sm:btn-md gap-2  transition-all"
-                        >
-                            <span className="hidden sm:inline">Logout</span>
-                            <LogOut size={18} />
-                        </button>
+                        <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-1 w-65 p-2 shadow max-h-60">
+                            <div className="px-3 py-2 text-xs text-base-content/60 truncate">{user.email}</div>
+                            <li>
+                                {user.email === "almadinatulilmia.fsd@dawateislami.net" ? (
+                                    <a onClick={() => navigate('/librarian-dashboard')}>Librarian Dashboard</a>
+                                ) : (
+                                    <a onClick={() => navigate('/IRCLibrary')}>IRC Library</a>
+                                )}
+                            </li>
+                            <li><a onClick={handleLogout}>Logout</a></li>
+                        </ul>
                     </div>
                 ) : (
                     <Link
                         to="/login"
-                        className="btn btn-neutral btn-dash btn-outline btn-sm gap-2  transition-all"
+                        className="btn btn-neutral btn-dash btn-outline btn-md gap-2 transition-all"
                     >
                         <span className="hidden sm:inline">Login</span>
                         <LogIn size={18} />
