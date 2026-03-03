@@ -47,8 +47,8 @@ export const Navbar = () => {
             <div className="navbar-end flex items-end gap-4">
                 {user ? (
                     <div className="dropdown dropdown-end dropdown-bottom">
-                        <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-                            <div className="w-10 rounded-full bg-neutral text-neutral-content flex items-center justify-center">
+                        <div tabIndex={0} role="button" className="btn p-0 mask mask-squircle avatar">
+                            <div className="w-10 mask mask-squircle bg-neutral text-neutral-content flex items-center justify-center">
                                 <span className="text-sm font-bold">
                                     {user.displayName 
                                         ? user.displayName.split(' ').map(name => name.charAt(0).toUpperCase()).join('')
