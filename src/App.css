@@ -4,10 +4,10 @@
     font-size: 18px;
 }
 
-.overflow-x-auto::-webkit-scrollbar {
+/* .overflow-x-auto::-webkit-scrollbar {
   height: 6px;
 }
 .overflow-x-auto::-webkit-scrollbar-thumb {
   background-color: oklch(var(--n));
   border-radius: 10px;
-}
+} */

@@ -1,6 +1,7 @@
 import { useAuth } from '@/context/AuthContext';
 import { LogIn, SquareLibrary } from 'lucide-react'
 import React from 'react'
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -8,6 +9,7 @@ export const Navbar = () => {
 
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+    const [scrolled, setScrolled] = useState(false);
 
     const handleLogout = async () => {
         try {
@@ -19,7 +21,7 @@ export const Navbar = () => {
         }
     };
     return (
-        <header className="navbar shadow-sm px-3 sm:px-21 w-full flex items-center justify-between sticky top-0 z-50 bg-base-100">
+        <header className={`navbar px-3 sm:px-21 w-full flex items-center justify-between fixed top-0 z-50 bg-base-100 transition-shadow duration-300 ${scrolled ? 'shadow-md' : 'shadow-sm'}`}>
             <div className="navbar-start">
                 <div className="dropdown">
                     <div tabIndex={0} role="button" className="btn btn-ghost">
@@ -50,7 +52,7 @@ export const Navbar = () => {
                         <div tabIndex={0} role="button" className="btn p-0 mask mask-squircle avatar">
                             <div className="w-10 mask mask-squircle bg-neutral text-neutral-content flex items-center justify-center">
                                 <span className="text-sm font-bold">
-                                    {user.displayName 
+                                    {user.displayName
                                         ? user.displayName.split(' ').map(name => name.charAt(0).toUpperCase()).join('')
                                         : user.email.charAt(0).toUpperCase()
                                     }

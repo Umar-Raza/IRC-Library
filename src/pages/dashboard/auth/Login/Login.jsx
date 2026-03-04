@@ -62,7 +62,7 @@ export const Login = () => {
   };
 
   return (
-    <div className="flex-1 flex items-center justify-center content-center p-4 overflow-hidden">
+    <div className="flex-1 flex items-center justify-center p-4">
       <div className="w-full max-w-md my-auto">
         <div className="bg-base-100 p-6 sm:p-10 rounded-3xl border border-base-300 shadow-sm">
           <div className="text-center mb-10">

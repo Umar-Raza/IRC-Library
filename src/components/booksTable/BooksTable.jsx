@@ -1,9 +1,10 @@
 import React from 'react'
-import { Book,  Download, EllipsisVertical, Loader, SquareMousePointer, SquarePen } from 'lucide-react'
+import { Book, Download, EllipsisVertical, Loader, SquareMousePointer, SquarePen } from 'lucide-react'
 import { DeleteBook } from '@/pages/dashboard/librarianDasboard/DeleteBook';
 import { toast } from 'react-hot-toast';
 import { useBooks } from '@/context/BooksContext';
 import { useAuth } from '@/context/AuthContext';
+import { ScrollToTop } from '../scrollToTop/ScrollToTop';
 
 export const BooksTable = ({ books, handleEditBook, updateStatus, loading, isAdmin = false }) => {
 
@@ -32,15 +33,15 @@ export const BooksTable = ({ books, handleEditBook, updateStatus, loading, isAdm
 
   return (
     <>
-      <div className="relative overflow-x-auto max-h-[70vh]" dir="rtl">
+      <div className="relative overflow-x-auto min-h-[70vh]" dir="rtl">
         <table className="table w-full min-w-200 zain-light">
           <thead className="bg-neutral sticky top-0 text-neutral-content z-20">
             <tr>
               <th className="w-10">#</th>
               <th className="w-20">تصویر</th>
-              <th className="w-60">کتاب</th>
+              <th className="w-70">کتاب</th>
               <th className="w-40">کتاب کی تفصیل</th>
-              <th className="w-30 " >کتاب ڈاؤن لوڈ</th>
+              <th className="w-15" >کتاب ڈاؤن لوڈ</th>
               <th className="w-40 text-center">اسٹیٹس</th>
               {isAdmin && <th className="w-24 text-center">ایکشن</th>}
             </tr>
@@ -102,9 +103,9 @@ export const BooksTable = ({ books, handleEditBook, updateStatus, loading, isAdm
                       <p><span className="font-semibold text-[16px]">مکتبہ:</span> <span className="text-[15px] mr-1">{book.publisher}</span></p>
                     </div>
                   </td>
-                  <td className="py-4 text-center whitespace-nowrap">
+                  <td className="py-4 whitespace-nowrap">
                     <button
-                      className="btn btn-outline btn-accent btn-sm sm:btn-md font-sans"
+                      className="btn btn-outline btn-neutral btn-sm sm:btn-md font-sans"
                       onClick={() => {
                         if (book.bookLink) {
                           window.open(book.bookLink, '_blank');
@@ -113,18 +114,16 @@ export const BooksTable = ({ books, handleEditBook, updateStatus, loading, isAdm
                         }
                       }}
                     >
-                      Download <Download size={20} />
+                      <Download size={20} />
                     </button>
                   </td>
                   <td className="py-4 text-center whitespace-nowrap">
                     <div className="relative flex items-center justify-center w-full min-w-32 h-10">
-
                       {/* Reader */}
                       {!isLibrarian && readerName && (() => {
                         const isIssuedToMe = book.status === readerName;
                         const isAvailable = book.status === 'library';
                         const issuedToOther = !isAvailable && !isIssuedToMe;
-
                         // Display current holder if issued user
                         if (isIssuedToMe) {
                           return (
@@ -212,6 +211,7 @@ export const BooksTable = ({ books, handleEditBook, updateStatus, loading, isAdm
           </tbody>
         </table>
       </div>
+      <ScrollToTop />
     </>
   )
 }

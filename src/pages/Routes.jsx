@@ -19,34 +19,37 @@ const index = () => {
     return (
         <AuthProvider>
             <BookProvider>
-                <Navbar />
-                <main className='flex-1 flex flex-col'>
-                    <Routes>
-                        <Route path='/' element={<Home />} />
-                        <Route path='/readerRegister' element={<ReaderRegister />} />
-                        <Route path='/pending' element={
-                            <ProtectedRouteForPending>
-                                <PendingApproval />
-                            </ProtectedRouteForPending>
-                        } />
-                        <Route path='/login' element={
-                            <PublicRouteForLibrarian>
-                                <Login />
-                            </PublicRouteForLibrarian>} />
-                        <Route path='/IRCLibrary' element={
-                            <ProtectedRouteForReader>
-                                <IRCLibrary />
-                            </ProtectedRouteForReader>
-                        } />
-                        <Route path='/librarian-dashboard' element={
-                            <ProtectedRouteForLibrarian>
-                                <LibrarianDashboard />
-                            </ProtectedRouteForLibrarian>} />
-                        <Route path='*' element={<NoPage />} />
-                    </Routes>
-                </main>
-                <Toaster />
-                <Footer />
+
+                <div className='flex flex-col min-h-screen'>
+                    <Navbar />
+                    <main className='flex-1 flex flex-col pt-16'>
+                        <Routes>
+                            <Route path='/' element={<Home />} />
+                            <Route path='/readerRegister' element={<ReaderRegister />} />
+                            <Route path='/pending' element={
+                                <ProtectedRouteForPending>
+                                    <PendingApproval />
+                                </ProtectedRouteForPending>
+                            } />
+                            <Route path='/login' element={
+                                <PublicRouteForLibrarian>
+                                    <Login />
+                                </PublicRouteForLibrarian>} />
+                            <Route path='/IRCLibrary' element={
+                                <ProtectedRouteForReader>
+                                    <IRCLibrary />
+                                </ProtectedRouteForReader>
+                            } />
+                            <Route path='/librarian-dashboard' element={
+                                <ProtectedRouteForLibrarian>
+                                    <LibrarianDashboard />
+                                </ProtectedRouteForLibrarian>} />
+                            <Route path='*' element={<NoPage />} />
+                        </Routes>
+                    </main>
+                    <Toaster />
+                    <Footer />
+                </div>
             </BookProvider>
         </AuthProvider>
     )

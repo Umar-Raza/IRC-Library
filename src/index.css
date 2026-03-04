@@ -49,27 +49,15 @@ body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  overflow: hidden;
-  height: 100%;
+  overflow-x: hidden;
+  /* height: 100%; */
 }
 
-#root {
-  display: flex;
-  flex-direction: column;
-  height: 100dvh;
-}
-
-main {
-  flex: 1;
+body{
   overflow-y: auto;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
 }
 
-main::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
-  /* goggle fonts */
-}
+/* goggle fonts */
 .zain-light {
   font-family: "Zain", sans-serif;
   font-weight: 300;
