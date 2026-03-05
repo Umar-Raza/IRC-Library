@@ -24,7 +24,8 @@ export default function App() {
                     <rect width="100%" height="100%" fill="url(#islamic-geo)" className="text-slate-400" />
                 </svg>
             </div>
-
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full pointer-events-none blur-3xl opacity-20"
+                style={{ background: "oklch(50% 0.05 240 / 0.3)" }} />
             {/* 2. مرکزی مواد (Main Content) */}
             <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="max-w-4xl mx-auto w-full text-center">

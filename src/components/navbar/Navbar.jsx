@@ -74,7 +74,7 @@ export const Navbar = () => {
                 ) : (
                     <Link
                         to="/login"
-                        className="btn btn-neutral btn-dash btn-outline btn-md gap-2 transition-all"
+                        className="btn btn-neutral btn-md gap-2 transition-all"
                     >
                         <span className="hidden sm:inline">Login</span>
                         <LogIn size={18} />

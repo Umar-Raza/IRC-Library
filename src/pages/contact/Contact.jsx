@@ -38,8 +38,15 @@ export const Contact = () => {
     ];
 
     return (
-        <div className="py-10 px-4">
-            <h2 className="text-2xl font-bold text-center mb-8 text-neutral underline">Contact</h2>
+        <div id='contact' className="py-10 px-4 mb-5 text-center">
+            <h2 className="text-2xl sm:text-5xl underline font-sans font-bold text-neutral leading-[1.15] mb-10">
+                Contact</h2>
+            <h3 className="italic font-light font-serif text-neutral/70 text-3xl mb-5 sm:text-5xl">
+                Support & Connection
+            </h3>
+            <p className="text-sm sm:text-base text-[oklch(40%_0.02_240)] leading-relaxed max-w-2xl mx-auto mb-12">
+                Have questions about our collections or wish to support our library through a donation? Reach out to us through any of the channels below.
+            </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
                 {contactDetails.map((item) => (
                     <a

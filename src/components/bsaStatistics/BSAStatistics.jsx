@@ -22,7 +22,7 @@ export const BSAStatistics = () => {
     return (
         <>
 
-            <div className="relative mt-0 font max-w-4xl mb-12 mx-auto w-full text-center">
+            <div className="relative font max-w-4xl mb-15 mt-12 sm:mt-16  mx-auto w-full text-center">
                 {/* ہورائزنٹل بیم (Horizontal Beam) */}
                 {/* <div className="flex justify-center items-center w-full my-8 sm:my-12 px-4">
                     <div className="relative w-full max-w-xs sm:max-w-md h-px bg-slate-200">
