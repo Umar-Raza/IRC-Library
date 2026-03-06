@@ -30,14 +30,14 @@ export const About = () => {
 
     return (
         <section
-            id='about' className="relative container mx-auto mb-5 px-4 sm:px-6 lg:px-8 overflow-hidden"
+            id='about' className="relative container mx-auto mb-8 px-4 sm:px-6 lg:px-8 overflow-hidden"
         >
             {/* ── Header ── */}
             <div className="text-center mb-16">
-                <h2 className="text-2xl sm:text-5xl underline font-sans font-bold text-neutral leading-[1.15] mb-10">
+                <h2 className="text-2xl sm:text-5xl underline font-sans font-bold text-neutral leading-[1.15] mb-15">
                     About
                 </h2>
-                <h3 className="italic font-light font-serif text-neutral/70 text-3xl mb-5 sm:text-5xl">
+                <h3 className="italic font-light font-serif text-neutral/70 text-3xl mb-6 sm:text-5xl">
                     Built for Scholars
                 </h3>
                 <p className="text-sm sm:text-base text-[oklch(40%_0.02_240)] leading-relaxed max-w-2xl mx-auto">
@@ -49,7 +49,7 @@ export const About = () => {
             </div>
             {/* ── Feature cards ── */}
             {/* grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-12">
                 {features.map((f, i) => (
                     <div
                         key={i}
@@ -71,7 +71,7 @@ export const About = () => {
                     </div>
                 ))}
             </div>
-            <div className="relative rounded-xl overflow-hidden border max-w-6xl mx-auto border-base-300 bg-neutral">
+            <div className="relative rounded-xl overflow-hidden border max-w-6xl mx-auto border-base-300 bg-neutral mb-12 sm:mb-8">
                 <div className="absolute -top-16 -right-16 w-56 h-56 rounded-full blur-3xl pointer-events-none"
                     style={{ background: "oklch(50% 0.05 240 / 0.1)" }} />
                 <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 p-8">
@@ -79,8 +79,8 @@ export const About = () => {
                         <p className="text-[9px] uppercase tracking-[0.3em] font-semibold text-base-100/80 mb-2">
                             Get in Touch
                         </p>
-                        <p className="text-lg font-bold font-serif text-base-100 leading-relaxed mb-1">
-                            Al-Madinatul Ilmiyyah — Dawat-e-Islami, Faisalabad
+                        <p className="text-lg font-bold font-sans text-base-100 leading-relaxed mb-1">
+                            Islamic research center — Dawat-e-Islami, Faisalabad
                         </p>
                         <a href="mailto:almadinatulilmia.fsd@dawateislami.net"
                             className="text-sm text-base-100 transition-colors hover:underline">

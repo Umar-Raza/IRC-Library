@@ -38,10 +38,10 @@ export const Contact = () => {
     ];
 
     return (
-        <div id='contact' className="mx-auto container mb-5 px-4 sm:px-6 lg:px-8 overflow-hidden text-center">
-            <h2 className="text-2xl sm:text-5xl underline font-sans font-bold text-neutral leading-[1.15] mb-10">
+        <div id='contact' className="mx-auto container mb-10 sm:mb-18  px-4 sm:px-6 lg:px-8 overflow-hidden text-center">
+            <h2 className="text-2xl sm:text-5xl underline font-sans font-bold text-neutral leading-[1.15] mb-10 sm:mb-12 ">
                 Contact</h2>
-            <h3 className="italic font-light font-serif text-neutral/70 text-3xl mb-5 sm:text-5xl">
+            <h3 className="italic font-light font-serif text-neutral/70 text-3xl mb-6 sm:text-5xl">
                 Support & Connection
             </h3>
             <p className="text-sm sm:text-base text-[oklch(40%_0.02_240)] leading-relaxed max-w-2xl mx-auto mb-12">

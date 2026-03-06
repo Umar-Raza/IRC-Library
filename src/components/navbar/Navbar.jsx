@@ -27,18 +27,24 @@ export const Navbar = () => {
     };
 
     const handleHashNav = (hash) => {
+        const scrollToElement = () => {
+            const el = document.getElementById(hash)
+            if (el) {
+                const navbarHeight = 74 // fixed navbar کی height
+                const top = el.getBoundingClientRect().top + window.scrollY - navbarHeight
+                window.scrollTo({ top, behavior: 'smooth' })
+            }
+        }
         if (window.location.pathname === '/') {
-            document.getElementById(hash)?.scrollIntoView({ behavior: 'smooth' })
+            scrollToElement()
         } else {
             navigate('/')
-            setTimeout(() => {
-                document.getElementById(hash)?.scrollIntoView({ behavior: 'smooth' })
-            }, 300)
+            setTimeout(scrollToElement, 300)
         }
     }
 
     return (
-        <header className={`navbar px-3 sm:px-6 lg:px-19 w-full flex items-center justify-between fixed top-0 z-50 bg-base-100 transition-shadow duration-300 ${scrolled ? 'shadow-md' : 'shadow-sm'}`}>
+        <header className={`navbar px-3 sm:px-6 lg:px-20 w-full flex items-center justify-between fixed top-0 z-50 bg-base-100 transition-shadow duration-300 ${scrolled ? 'shadow-md' : 'shadow-sm'}`}>
             <div className="navbar-start">
                 <div className="dropdown">
                     <div tabIndex={0} role="button" className="btn btn-ghost">

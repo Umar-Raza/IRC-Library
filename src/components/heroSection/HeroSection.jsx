@@ -11,7 +11,7 @@ export default function App() {
 
 
     return (
-        <section className="relative pt-16 pb-1 sm:pt-24 sm:pb-12 flex flex-col justify-center">
+        <section className="relative pt-16 pb-2 sm:pt-24 sm:pb-8 flex flex-col justify-center">
             {/* 1. پس منظر کا نمونہ (Background Pattern) */}
             <div className="absolute inset-0 opacity-40 pointer-events-none">
                 <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -44,23 +44,18 @@ export default function App() {
                             <div className="absolute -inset-2 bg-[oklch(50%_0.05_240/0.1)] blur-2xl rounded-full -z-10" />
                         </div>
                     </div>
-
                     <div className="mb-4 sm:mb-6">
                         <p className="text-neutral/45 text-[9px] sm:text-xs tracking-[0.3em] sm:tracking-[0.5em] uppercase font-semibold">
                             Islamic Research Center
                         </p>
                     </div>
-
                     <h1 className="text-4xl sm:text-6xl lg:text-8xl font-serif font-bold text-neutral leading-[1.2] sm:leading-[1.1] mb-6 sm:mb-8">
                         Where Scholars <br />
                         <span className="italic font-light text-neutral/80 text-3xl sm:text-5xl lg:text-7xl">Find Books</span>
                     </h1>
-
                     <p className="text-sm sm:text-lg text-[oklch(40%_0.02_240)] leading-relaxed max-w-xl mx-auto mb-8 sm:mb-12 px-2">
                         A premier digital repository of Islamic manuscripts and scholarly research — exclusively curated for the IRC community.
                     </p>
-
-                    {/* ایکشن بٹنز (Action Buttons) */}
                     <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12 w-full max-w-sm sm:max-w-none mx-auto">
                         <Link to="/IRCLibrary" className='w-80 sm:w-auto'>
                             <button className="relative group cursor-pointer overflow-hidden w-full sm:w-auto min-w-50 px-8 py-3.5 sm:py-4 rounded-xl bg-neutral text-base-100 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-base-100 flex items-center justify-center gap-3">
@@ -79,10 +74,8 @@ export default function App() {
                             </button>
                         </Link>
                     </div>
-
                 </div>
             </div>
-
         </section>
     );
 }

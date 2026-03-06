@@ -6,6 +6,7 @@ import { About } from '../about/About'
 import HeroSection from '@/components/heroSection/HeroSection'
 import { BSAStatistics } from '@/components/bsaStatistics/BSAStatistics'
 import { ScrollToTop } from '@/components/scrollToTop/ScrollToTop'
+import { FooterNav } from '@/components/footerNav/FooterNav'
 
 export const Home = () => {
 
@@ -15,7 +16,8 @@ export const Home = () => {
             <BSAStatistics />
             <About />
             <Contact />
-            <ScrollToTop/>
+            <FooterNav />
+            <ScrollToTop />
         </>
     )
 }
