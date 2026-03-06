@@ -34,7 +34,7 @@ export const About = () => {
         >
             {/* ── Header ── */}
             <div className="text-center mb-16">
-                <h2 className="text-2xl sm:text-5xl underline font-sans font-bold text-neutral leading-[1.15] mb-15">
+                <h2 className="text-2xl sm:text-5xl underline font-sans font-bold text-neutral leading-[1.15] mb-12 sm:mb-16">
                     About
                 </h2>
                 <h3 className="italic font-light font-serif text-neutral/70 text-3xl mb-6 sm:text-5xl">
@@ -48,7 +48,6 @@ export const About = () => {
                 </p>
             </div>
             {/* ── Feature cards ── */}
-            {/* grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-12">
                 {features.map((f, i) => (
                     <div
@@ -56,7 +55,6 @@ export const About = () => {
                         className="group relative rounded-xl p-6 border border-base-300 bg-base-100 hover:bg-base-200 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg cursor-default overflow-hidden"
                         style={{ transitionDelay: `${i * 60}ms` }}
                     >
-                        {/* shimmer */}
                         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-xl"
                             style={{ background: "linear-gradient(135deg, oklch(98% 0.02 240 / 0.6) 0%, transparent 60%)" }} />
                         <div className="w-10 h-10 rounded-lg bg-base-200 group-hover:bg-base-300 flex items-center justify-center mb-4 text-neutral transition-all duration-300 group-hover:scale-110">

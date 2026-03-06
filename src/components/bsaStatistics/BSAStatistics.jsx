@@ -23,13 +23,6 @@ export const BSAStatistics = () => {
         <>
 
             <div className="relative font max-w-4xl mb-20  mt-10 sm:mt-16  mx-auto w-full text-center">
-                {/* ہورائزنٹل بیم (Horizontal Beam) */}
-                {/* <div className="flex justify-center items-center w-full my-8 sm:my-12 px-4">
-                    <div className="relative w-full max-w-xs sm:max-w-md h-px bg-slate-200">
-                        <div className="absolute inset-0 bg-linear-to-r from-transparent via-slate-400 to-transparent w-1/2 h-full"
-                            style={{ animation: 'beamHorizontal 3s ease-in-out infinite' }} />
-                    </div>
-                </div> */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-0 divide-y sm:divide-y-0 divide-[oklch(92%_0.04_240)]">
                     <StatCard number={parseInt(stats[0].number)} label={stats[0].label} />
                     <StatCard number={parseInt(stats[1].number)} label={stats[1].label} isMiddle />

@@ -30,7 +30,7 @@ export const Navbar = () => {
         const scrollToElement = () => {
             const el = document.getElementById(hash)
             if (el) {
-                const navbarHeight = 74 // fixed navbar کی height
+                const navbarHeight = 74 
                 const top = el.getBoundingClientRect().top + window.scrollY - navbarHeight
                 window.scrollTo({ top, behavior: 'smooth' })
             }

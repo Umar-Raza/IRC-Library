@@ -25,7 +25,6 @@ export const FooterNav = () => {
 
     return (
         <div className="container mx-auto px-6 sm:px-10 py-10  flex flex-col items-center gap-8 border-t border-base-300">
-            {/* Logo */}
             <div className='navbar-center flex items-center justify-center gap-3 group font-sans'>
                 <SquareLibrary className="text-neutral w-6 h-6 sm:w-9 sm:h-9" />
                 <Link to="/">
@@ -35,8 +34,6 @@ export const FooterNav = () => {
                     </span>
                 </Link>
             </div>
-
-            {/* Nav links */}
             <nav className="flex flex-row flex-nowrap items-center justify-center gap-x-4 sm:gap-x-8">
                 {links.map((link, i) =>
                     link.hash ? (

@@ -4,14 +4,7 @@ export const Footer = () => {
 
     return (
         <footer className="bg-base-100 border-t border-base-300">
-
-            {/* Top section */}
-        
-
-            {/* Divider */}
             <div className="border-t border-base-300" />
-
-            {/* Bottom section */}
             <div className="container mx-auto px-6 sm:px-10 py-5 flex flex-col items-center justify-center gap-4">
                 <p className="text-xs sm:text-sm leading-relaxed text-center">
                     Copyright © {new Date().getFullYear()} - All right reserved by{' '}

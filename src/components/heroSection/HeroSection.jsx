@@ -8,11 +8,8 @@ import {
 import { Link } from 'react-router-dom';
 
 export default function App() {
-
-
     return (
         <section className="relative pt-16 pb-2 sm:pt-24 sm:pb-8 flex flex-col justify-center">
-            {/* 1. پس منظر کا نمونہ (Background Pattern) */}
             <div className="absolute inset-0 opacity-40 pointer-events-none">
                 <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
                     <defs>
@@ -26,10 +23,8 @@ export default function App() {
             </div>
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full pointer-events-none blur-3xl opacity-20"
                 style={{ background: "oklch(50% 0.05 240 / 0.3)" }} />
-            {/* 2. مرکزی مواد (Main Content) */}
             <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="max-w-4xl mx-auto w-full text-center">
-                    {/* پریمیم بیج (Premium Badge) */}
                     <div className="flex justify-center mb-6 sm:mb-8 group">
                         <div className="animate-[float_4s_easeInOut_infinite] relative">
                             <div className="relative p-px rounded-full overflow-hidden">
