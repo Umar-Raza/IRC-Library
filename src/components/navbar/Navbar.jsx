@@ -32,10 +32,15 @@ export const Navbar = () => {
                         className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
                         <li><Link to="/" className='btn btn-md btn-neutral btn-ghost'>Home</Link></li>
                         <li><Link to="/IRCLibrary" className='btn btn-md btn-neutral btn-ghost'>IRC Library</Link></li>
+                        {/* <li><Link to="/IRCLibrary" className='btn btn-md btn-neutral btn-ghost'>About</Link></li>
+                        <li><Link to="/IRCLibrary" className='btn btn-md btn-neutral btn-ghost'>Contact</Link></li> */}
+                        <li><button onClick={() => { document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }); }} className='btn btn-md btn-neutral btn-ghost justify-center'>About</button></li>
+                        <li><button onClick={() => { document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }); }} className='btn btn-md btn-neutral btn-ghost justify-center'>Contact</button></li>
+
+                        
                     </ul>
                 </div>
             </div>
-
             <div className='navbar-center flex items-center justify-center gap-3 group font-sans'>
                 <SquareLibrary className="text-neutral w-6 h-6 sm:w-9 sm:h-9" />
                 <Link to="/">
