@@ -47,9 +47,9 @@ const index = () => {
                             <Route path='*' element={<NoPage />} />
                         </Routes>
                     </main>
-                    <Toaster />
                     <Footer />
                 </div>
+                <Toaster />
             </BookProvider>
         </AuthProvider>
     )
