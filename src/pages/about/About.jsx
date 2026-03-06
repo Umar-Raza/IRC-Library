@@ -30,7 +30,7 @@ export const About = () => {
 
     return (
         <section
-            id='about' className="relative z-10 container mx-auto mb-5 px-4 sm:px-47 overflow-hidden"
+            id='about' className="relative container mx-auto mb-5 px-4 sm:px-6 lg:px-8 overflow-hidden"
         >
             {/* ── Header ── */}
             <div className="text-center mb-16">
@@ -48,7 +48,8 @@ export const About = () => {
                 </p>
             </div>
             {/* ── Feature cards ── */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+            {/* grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-10">
                 {features.map((f, i) => (
                     <div
                         key={i}
@@ -70,7 +71,7 @@ export const About = () => {
                     </div>
                 ))}
             </div>
-            <div className="relative rounded-xl overflow-hidden border border-base-300 bg-neutral">
+            <div className="relative rounded-xl overflow-hidden border max-w-6xl mx-auto border-base-300 bg-neutral">
                 <div className="absolute -top-16 -right-16 w-56 h-56 rounded-full blur-3xl pointer-events-none"
                     style={{ background: "oklch(50% 0.05 240 / 0.1)" }} />
                 <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 p-8">

@@ -38,7 +38,7 @@ export const Contact = () => {
     ];
 
     return (
-        <div id='contact' className="py-10 px-4 mb-5 text-center">
+        <div id='contact' className="mx-auto container mb-5 px-4 sm:px-6 lg:px-8 overflow-hidden text-center">
             <h2 className="text-2xl sm:text-5xl underline font-sans font-bold text-neutral leading-[1.15] mb-10">
                 Contact</h2>
             <h3 className="italic font-light font-serif text-neutral/70 text-3xl mb-5 sm:text-5xl">
